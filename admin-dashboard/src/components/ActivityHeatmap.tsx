@@ -1,5 +1,5 @@
 // src/components/ActivityHeatmap.tsx
-import React from 'react';
+
 import { Flame } from 'lucide-react'; // Gunakan icon Lucide
 
 interface Props {

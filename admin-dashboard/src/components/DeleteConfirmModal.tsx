@@ -1,5 +1,4 @@
 // src/components/DeleteConfirmModal.tsx
-import React from 'react';
 import { AlertTriangle, Trash2, Loader2 } from 'lucide-react';
 
 interface Props {

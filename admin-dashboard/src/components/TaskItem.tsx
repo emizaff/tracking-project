@@ -1,5 +1,4 @@
 // src/components/TaskItem.tsx
-import React from 'react';
 import type { Task } from '../types';
 import ActionMenu from './ActionMenu';
 import { Play, Check, Plus, Calendar, Clock, Target } from 'lucide-react';

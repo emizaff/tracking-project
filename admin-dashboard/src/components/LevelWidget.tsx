@@ -1,5 +1,4 @@
 // src/components/LevelWidget.tsx
-import React from 'react';
 import { Trophy, Zap, Sparkles } from 'lucide-react';
 
 interface Props {

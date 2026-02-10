@@ -22,7 +22,6 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
-  Target
 } from 'lucide-react';
 
 // Components

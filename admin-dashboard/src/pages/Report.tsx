@@ -1,5 +1,5 @@
 // src/pages/Report.tsx
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrackingService } from '../services/trackingService';
 import type { Project } from '../types';

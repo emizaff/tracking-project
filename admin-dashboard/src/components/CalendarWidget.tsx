@@ -1,5 +1,5 @@
 // src/components/CalendarWidget.tsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { Project } from '../types';
 import { ChevronLeft, ChevronRight, Calendar, Target } from 'lucide-react';
 

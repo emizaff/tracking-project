@@ -1,5 +1,4 @@
 // src/components/ProductivityChart.tsx
-import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { BarChart2 } from 'lucide-react';
 

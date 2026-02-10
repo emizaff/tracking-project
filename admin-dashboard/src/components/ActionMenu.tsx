@@ -1,5 +1,5 @@
 // src/components/ActionMenu.tsx
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { MoreVertical, Trash2, CheckSquare } from 'lucide-react';
 
 interface Props {
