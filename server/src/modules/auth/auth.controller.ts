@@ -3,10 +3,10 @@ import { Elysia, t } from "elysia";
 import { AuthService } from "./auth.service";
 import { db } from "../../db";
 import { users, sessions } from "../../db/schema/auth.schema";
-import { eq } from "drizzle-orm"; // 👈 Jangan lupa import ini
+import { eq } from "drizzle-orm"; 
 import { v4 as uuidv4 } from "uuid";
 
-// URL Frontend (React)
+// URL Frontend (React) - Pastikan ini benar
 const FRONTEND_URL = "https://faiq-tracking-project.netlify.app";
 
 export const authController = new Elysia({ prefix: "/auth" })
@@ -27,14 +27,15 @@ export const authController = new Elysia({ prefix: "/auth" })
 
         // A. JIKA SUDAH PUNYA AKUN -> LOGIN LANGSUNG
         if (result.status === 'LOGIN') {
-            const isProduction = process.env.NODE_ENV === 'production';
+            
+            // 🔥 FIX UTAMA DISINI:
             cookie.session_id.set({
                 value: result.token!,
                 httpOnly: true,
                 path: "/",
                 maxAge: 7 * 86400,
-                sameSite: "lax",
-                secure: isProduction,
+                sameSite: "none",      // 👈 WAJIB "none" biar bisa nyebrang domain
+                secure: true,          // 👈 WAJIB "true"
             });
 
             return redirect(`${FRONTEND_URL}/dashboard`);
@@ -65,18 +66,16 @@ export const authController = new Elysia({ prefix: "/auth" })
       const { email, username, password, googleId, picture } = body as any;
 
       try {
-        // Simpan User Baru
         const [newUser] = await db.insert(users).values({
             email,
             username,
-            password: password || "", // Password boleh kosong kalau login Google
+            password: password || "", 
             googleId,
             picture,
             level: 1,
             xp: 0
         }).returning();
 
-        // Buat Session Login Otomatis
         const token = uuidv4();
         const expiresAt = Math.floor(Date.now() / 1000) + (7 * 86400);
         
@@ -86,12 +85,14 @@ export const authController = new Elysia({ prefix: "/auth" })
             expiresAt
         });
 
-        // Set Cookie biar langsung login
+        // 🔥 FIX COOKIE REGISTER JUGA:
         cookie.session_id.set({
             value: token,
             httpOnly: true,
             path: "/",
             maxAge: 7 * 86400,
+            sameSite: "none",      // 👈 WAJIB
+            secure: true,          // 👈 WAJIB
         });
 
         return { success: true, user: newUser };
@@ -101,12 +102,11 @@ export const authController = new Elysia({ prefix: "/auth" })
       }
   })
 
-  // --- 4. Endpoint LOGIN MANUAL (Email + Password) [BARU] ---
+  // --- 4. Endpoint LOGIN MANUAL (Email + Password) ---
   .post("/login", async ({ body, cookie, set }) => {
       const { email, password } = body as any;
 
       try {
-        // Cari user berdasarkan email
         const user = await db.query.users.findFirst({
             where: eq(users.email, email)
         });
@@ -116,21 +116,18 @@ export const authController = new Elysia({ prefix: "/auth" })
             return { success: false, message: "Email tidak terdaftar" };
         }
 
-        // Cek apakah user ini khusus Google Login (Password kosong)
         if (!user.password && user.googleId) {
             set.status = 400;
-            return { success: false, message: "Akun ini terdaftar via Google. Silakan klik tombol Google." };
+            return { success: false, message: "Akun ini via Google. Login pake Google dong bang." };
         }
 
-        // Cek Password (Sementara Direct Compare, nanti bisa pakai Bun.password.verify)
         if (user.password !== password) {
              set.status = 400;
              return { success: false, message: "Password salah!" };
         }
 
-        // LOGIN SUKSES -> Buat Session
         const token = uuidv4();
-        const expiresAt = Math.floor(Date.now() / 1000) + (7 * 86400); // 7 Hari
+        const expiresAt = Math.floor(Date.now() / 1000) + (7 * 86400); 
         
         await db.insert(sessions).values({
             id: token,
@@ -138,15 +135,14 @@ export const authController = new Elysia({ prefix: "/auth" })
             expiresAt
         });
 
-        // Set Cookie
-        const isProduction = process.env.NODE_ENV === 'production';
+        // 🔥 FIX COOKIE LOGIN MANUAL JUGA:
         cookie.session_id.set({
             value: token,
             httpOnly: true,
             path: "/",
             maxAge: 7 * 86400,
-            sameSite: "lax",
-            secure: isProduction,
+            sameSite: "none",      // 👈 WAJIB
+            secure: true,          // 👈 WAJIB
         });
 
         return { success: true, user };
@@ -167,6 +163,7 @@ export const authController = new Elysia({ prefix: "/auth" })
   })
 
   .get("/me", async ({ cookie }) => {
+      // Endpoint ini akan aman kalau Cookie sudah masuk
       if(!cookie.session_id.value) return { user: null };
       const user = await AuthService.getSession(cookie.session_id.value);
       return { user };

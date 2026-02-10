@@ -1,170 +1,133 @@
-// server/src/modules/auth/auth.controller.ts
 import { Elysia, t } from "elysia";
-import { AuthService } from "./auth.service";
-import { db } from "../../db";
-import { users, sessions } from "../../db/schema/auth.schema";
-import { eq } from "drizzle-orm"; 
-import { v4 as uuidv4 } from "uuid";
+import { cors } from "@elysiajs/cors";
+import { rateLimit } from "elysia-rate-limit";
+import { authController } from "./modules/auth/auth.controller";
+import { trackingController } from "./modules/tracking/tracking.controller";
 
-// URL Frontend (React) - Pastikan ini benar
-const FRONTEND_URL = "https://faiq-tracking-project.netlify.app";
+// 🔥 IMPORT DATABASE
+import { db } from "./db";
+import { publicIdeas, goals } from "./db/schema/tracking.schema";
+import { eq, desc } from "drizzle-orm";
 
-export const authController = new Elysia({ prefix: "/auth" })
-  
-  // --- 1. Redirect ke Google ---
-  .get("/google", ({ redirect }) => {
-    const url = AuthService.getGoogleAuthURL();
-    return redirect(url);
+const app = new Elysia()
+  // ---------------------------------------------------------
+  // 🛡️ SECURITY LAYER 1: RATE LIMIT GLOBAL
+  // ---------------------------------------------------------
+  .use(rateLimit({
+      duration: 60000, // 1 Menit
+      max: 60,         // Maks 60 request
+      responseMessage: "Terlalu banyak request. Santai dulu bang! ☕",
+      countFailedRequest: true
+  }))
+
+  // ---------------------------------------------------------
+  // 🛡️ SECURITY LAYER 2: CORS (SIAP DEPLOY)
+  // ---------------------------------------------------------
+  .use(cors({
+      // 🔥 UBAH KE BINTANG (*) BIAR VERCEL BISA AKSES
+      origin: [
+        "http://localhost:5173",                      // Laptop
+        "https://faiq-tracking-project.netlify.app"   // Netlify (Production)
+      ], 
+      credentials: true, 
+      allowedHeaders: ["Content-Type", "Authorization"],
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+  }))
+
+  // --- GLOBAL ERROR HANDLER ---
+  .onError(({ code, error, set }) => {
+    if (code === 'VALIDATION') {
+      set.status = 400;
+      const firstError = error.all[0]; 
+      return { 
+        success: false, 
+        message: firstError.schema.error || `Data tidak valid: ${firstError.path.slice(1)}` 
+      };
+    }
+    if (code === 'NOT_FOUND') return { success: false, message: "Endpoint tidak ditemukan" };
+    
+    console.error("🔥 SERVER ERROR:", error);
+    return { success: false, message: error.message || "Terjadi kesalahan internal" };
   })
 
-  // --- 2. Callback Google (Logika Redirect Pintar) ---
-  .get("/google/callback", async ({ query, cookie, redirect }) => {
-    try {
-        const code = query.code as string;
-        if(!code) throw new Error("Code tidak ditemukan");
+  // Load Modules Utama
+  .use(authController)
+  .use(trackingController)
 
-        const result = await AuthService.handleGoogleCallback(code);
-
-        // A. JIKA SUDAH PUNYA AKUN -> LOGIN LANGSUNG
-        if (result.status === 'LOGIN') {
+  // ---------------------------------------------------------
+  // 🔥 GROUP 1: PUBLIC API (Goals, Projects, Ideas)
+  // ---------------------------------------------------------
+  .group("/public", (app) => 
+      app
+        .get("/goals", async () => {
+            return await db.select().from(goals).limit(5); 
+        })
+        .get("/projects", async () => {
+            try {
+                return await db.query.projects.findMany({
+                    with: { tasks: true },
+                    orderBy: (projects, { desc }) => [desc(projects.createdAt)],
+                    limit: 6 // Batasi biar gak berat
+                });
+            } catch (error) {
+                console.error("Error fetching public projects:", error);
+                return [];
+            }
+        })
+        .post("/ideas", async ({ body }) => {
+            const { senderName, content } = body;
             
-            // 🔥 FIX UTAMA DISINI:
-            cookie.session_id.set({
-                value: result.token!,
-                httpOnly: true,
-                path: "/",
-                maxAge: 7 * 86400,
-                sameSite: "none",      // 👈 WAJIB "none" biar bisa nyebrang domain
-                secure: true,          // 👈 WAJIB "true"
+            if (!content || content.length > 500) {
+                throw new Error("Isi ide tidak valid atau kepanjangan!");
+            }
+
+            await db.insert(publicIdeas).values({
+                senderName: senderName || "Anonim",
+                content,
+                isApproved: false
             });
 
-            return redirect(`${FRONTEND_URL}/dashboard`);
-        }
+            return { success: true, message: "Ide terkirim! Menunggu moderasi." };
+        }, {
+            body: t.Object({
+                senderName: t.Optional(t.String()),
+                content: t.String()
+            }),
+            // Rate Limit Khusus Input Ide (Anti Spam)
+            config: {
+                rateLimit: {
+                    max: 5, 
+                    duration: 3600000 // 1 Jam
+                }
+            }
+        })
+  )
 
-        // B. JIKA BELUM PUNYA AKUN -> LEMPAR KE REGISTER FORM
-        else if (result.status === 'REGISTER') {
-            const data = result.googleData!;
-            const params = new URLSearchParams({
-                email: data.email,
-                name: data.name,
-                picture: data.picture,
-                googleId: data.googleId,
-                isGoogleLogin: "true"
-            });
-
-            return redirect(`${FRONTEND_URL}/register?${params.toString()}`);
-        }
-
-    } catch (error: any) {
-        console.error("🔥 ERROR GOOGLE LOGIN:", error);
-        return redirect(`${FRONTEND_URL}/login?error=google_failed`);
-    }
-  })
-
-  // --- 3. Endpoint Register (User Baru) ---
-  .post("/register", async ({ body, cookie }) => {
-      const { email, username, password, googleId, picture } = body as any;
-
-      try {
-        const [newUser] = await db.insert(users).values({
-            email,
-            username,
-            password: password || "", 
-            googleId,
-            picture,
-            level: 1,
-            xp: 0
-        }).returning();
-
-        const token = uuidv4();
-        const expiresAt = Math.floor(Date.now() / 1000) + (7 * 86400);
-        
-        await db.insert(sessions).values({
-            id: token,
-            userId: newUser.id,
-            expiresAt
-        });
-
-        // 🔥 FIX COOKIE REGISTER JUGA:
-        cookie.session_id.set({
-            value: token,
-            httpOnly: true,
-            path: "/",
-            maxAge: 7 * 86400,
-            sameSite: "none",      // 👈 WAJIB
-            secure: true,          // 👈 WAJIB
-        });
-
-        return { success: true, user: newUser };
-      } catch (error: any) {
-          console.error("Register Error:", error);
-          return { success: false, message: error.message };
-      }
-  })
-
-  // --- 4. Endpoint LOGIN MANUAL (Email + Password) ---
-  .post("/login", async ({ body, cookie, set }) => {
-      const { email, password } = body as any;
-
-      try {
-        const user = await db.query.users.findFirst({
-            where: eq(users.email, email)
-        });
-
-        if (!user) {
-            set.status = 400;
-            return { success: false, message: "Email tidak terdaftar" };
-        }
-
-        if (!user.password && user.googleId) {
-            set.status = 400;
-            return { success: false, message: "Akun ini via Google. Login pake Google dong bang." };
-        }
-
-        if (user.password !== password) {
-             set.status = 400;
-             return { success: false, message: "Password salah!" };
-        }
-
-        const token = uuidv4();
-        const expiresAt = Math.floor(Date.now() / 1000) + (7 * 86400); 
-        
-        await db.insert(sessions).values({
-            id: token,
-            userId: user.id,
-            expiresAt
-        });
-
-        // 🔥 FIX COOKIE LOGIN MANUAL JUGA:
-        cookie.session_id.set({
-            value: token,
-            httpOnly: true,
-            path: "/",
-            maxAge: 7 * 86400,
-            sameSite: "none",      // 👈 WAJIB
-            secure: true,          // 👈 WAJIB
-        });
-
-        return { success: true, user };
-
-      } catch (error: any) {
-          console.error("Login Error:", error);
-          return { success: false, message: "Terjadi kesalahan server" };
-      }
-  })
-
-  // --- 5. Logout & Get Profile ---
-  .post("/logout", async ({ cookie }) => {
-    if (cookie.session_id.value) {
-        await AuthService.logout(cookie.session_id.value);
-        cookie.session_id.remove();
-    }
-    return { success: true };
-  })
-
-  .get("/me", async ({ cookie }) => {
-      // Endpoint ini akan aman kalau Cookie sudah masuk
-      if(!cookie.session_id.value) return { user: null };
-      const user = await AuthService.getSession(cookie.session_id.value);
-      return { user };
+  // ---------------------------------------------------------
+  // 🔥 GROUP 2: ADMIN API (Untuk Halaman Inbox / Moderasi)
+  // ---------------------------------------------------------
+  .group("/admin", (app) => 
+      app
+        .get("/ideas", async () => {
+            return await db.select().from(publicIdeas).orderBy(desc(publicIdeas.createdAt));
+        })
+        .patch("/ideas/:id/approve", async ({ params }) => {
+            await db.update(publicIdeas)
+                .set({ isApproved: true })
+                .where(eq(publicIdeas.id, Number(params.id)));
+            return { success: true, message: "Ide disetujui!" };
+        })
+        .delete("/ideas/:id", async ({ params }) => {
+            await db.delete(publicIdeas)
+                .where(eq(publicIdeas.id, Number(params.id)));
+            return { success: true, message: "Ide dihapus!" };
+        })
+  )
+  
+  // 🔥 PENTING BUAT RENDER: LISTEN KE 0.0.0.0
+  .listen({
+      port: process.env.PORT || 3000,
+      hostname: "0.0.0.0"
   });
+
+console.log(`🦊 Server Secured via Render: 0.0.0.0:${process.env.PORT || 3000}`);
