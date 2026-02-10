@@ -25,7 +25,10 @@ const app = new Elysia()
   // ---------------------------------------------------------
   .use(cors({
       // 🔥 UBAH KE BINTANG (*) BIAR VERCEL BISA AKSES
-      origin: "*", 
+      origin: [
+        "http://localhost:5173",                      // 💻 Buat Laptop (Development)
+        "https://faiq-tracking-project.netlify.app"   // 🌐 Buat Netlify (Production)
+      ], 
       credentials: true, 
       allowedHeaders: ["Content-Type", "Authorization"],
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
