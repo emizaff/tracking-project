@@ -1,5 +1,5 @@
 // admin-dashboard/src/services/trackingService.ts
-import type { Project, CalendarData, Task } from "../types";
+import type { Project, CalendarData } from "../types";
 import { API_BASE_URL } from "../config"; 
 
 const API_URL = `${API_BASE_URL}/tracking`;
