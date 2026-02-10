@@ -1,6 +1,6 @@
 // admin-dashboard/src/types/index.ts
 
-export type TaskType = "SINGLE" | "REPEATING" | "TIMER"; // Tambah TIMER
+export type TaskType = "SINGLE" | "REPEATING" | "TIMER";
 
 export interface TaskLog {
   id: number;
@@ -22,6 +22,9 @@ export interface Task {
   currentCount?: number;   // Hitungan saat ini
   isRecurring?: boolean;   // Apakah berulang?
   repeatFrequency?: string;// DAILY, WEEKLY, dll
+  
+  // 👇 INI YANG BIKIN ERROR (TADI HILANG)
+  deadline?: string | null; 
 }
 
 export interface Project {
