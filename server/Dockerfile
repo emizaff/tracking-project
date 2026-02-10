@@ -3,7 +3,7 @@ FROM oven/bun:1 as base
 WORKDIR /app
 
 # Copy file package (resep dependency)
-COPY package.json bun.lockb ./
+COPY package.json ./
 
 # Install dependencies (bahan-bahan)
 RUN bun install --production
