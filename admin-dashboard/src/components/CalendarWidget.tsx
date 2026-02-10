@@ -1,7 +1,7 @@
 // src/components/CalendarWidget.tsx
 import { useState } from 'react';
 import type { Project } from '../types';
-import { ChevronLeft, ChevronRight, Calendar, Target } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 
 interface CalendarWidgetProps {
   onDateClick?: (dateStr: string) => void;

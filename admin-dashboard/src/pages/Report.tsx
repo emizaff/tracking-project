@@ -39,7 +39,6 @@ export default function Report() {
   // --- LOGIKA HITUNG STATISTIK ---
   const allTasks = projects.flatMap(p => p.tasks);
   
-  const totalProjects = projects.length;
   const activeProjects = projects.filter(p => p.tasks.some(t => !t.isCompleted)).length;
   
   const totalTasks = allTasks.length;

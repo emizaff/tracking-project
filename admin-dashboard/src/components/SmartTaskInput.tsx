@@ -10,7 +10,7 @@ interface Props {
   projectDeadline?: string; 
 }
 
-export default function SmartTaskInput({ projectId, onTaskCreated, projectStartDate, projectDeadline }: Props) {
+export default function SmartTaskInput({ projectId, onTaskCreated, projectDeadline }: Props) {
   const [title, setTitle] = useState("");
   const [mode, setMode] = useState<'SIMPLE' | 'ADVANCED'>('SIMPLE');
   
@@ -21,7 +21,7 @@ export default function SmartTaskInput({ projectId, onTaskCreated, projectStartD
   // State Recurring
   const [isRecurring, setIsRecurring] = useState(false);
   const [repeatFrequency, setRepeatFrequency] = useState("DAILY");
-  const [repeatInterval, setRepeatInterval] = useState(1);
+  const [repeatInterval] = useState(1);
 
   // Logic Sisa Hari
   const today = new Date();

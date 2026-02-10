@@ -18,9 +18,7 @@ import {
     Calendar, 
     Flag, 
     Clock, 
-    CheckCircle2, 
     ListTodo, 
-    MoreVertical 
 } from 'lucide-react';
 
 export default function ProjectDetail() {

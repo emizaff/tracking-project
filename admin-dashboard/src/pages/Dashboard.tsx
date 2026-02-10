@@ -60,7 +60,6 @@ export default function Dashboard() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [slideOpen, setSlideOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [projectsOnDate, setProjectsOnDate] = useState<Project[]>([]);
   const [tasksOnDate, setTasksOnDate] = useState<Task[]>([]);
   const [slideTaskInput, setSlideTaskInput] = useState("");
 
@@ -178,8 +177,6 @@ export default function Dashboard() {
   };
 
   const refreshSlideData = (dateStr: string, currentProjects: Project[]) => {
-      const pOnDate = currentProjects.filter(p => p.deadline && new Date(p.deadline).toLocaleDateString('en-CA') === dateStr);
-      setProjectsOnDate(pOnDate);
       const tOnDate = currentProjects.flatMap(p => p.tasks).filter(t => {
           if (!t.deadline) return false;
           return new Date(t.deadline).toLocaleDateString('en-CA') === dateStr;
@@ -441,7 +438,11 @@ export default function Dashboard() {
                                             <div className="flex gap-2 text-[10px] text-slate-500 mt-0.5">
                                                 {t.isRecurring && <span className="text-purple-400 flex items-center gap-1">↻ {t.repeatFrequency}</span>}
                                                 {isCounter && (<span className="text-blue-400 font-bold bg-blue-900/20 px-1.5 rounded">{t.currentCount} / {t.targetCount} x</span>)}
-                                                {t.duration > 0 && <span className="text-indigo-400 font-bold bg-indigo-900/20 px-1.5 rounded">⏱ {t.duration} m</span>}
+                                                {(t.duration || 0) > 0 && (
+  <span className="text-indigo-400 font-bold bg-indigo-900/20 px-1.5 rounded">
+    ⏱ {t.duration} m
+  </span>
+)}
                                             </div>
                                         </div>
                                     </div>

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { User, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 
 export default function Register() {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
     email: '',

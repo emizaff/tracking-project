@@ -6,7 +6,6 @@ import {
     Pause, 
     Square, 
     CheckCircle2, 
-    Volume2, 
     VolumeX, 
     CloudRain, 
     Flame, 
