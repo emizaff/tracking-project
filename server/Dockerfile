@@ -2,19 +2,19 @@
 FROM oven/bun:1 as base
 WORKDIR /app
 
-# Copy file package (resep dependency)
+# Copy file package (Cukup package.json aja)
 COPY package.json ./
 
-# Install dependencies (bahan-bahan)
-RUN bun install --production
+# 🔥 PERBAIKAN: Hapus "--production" biar semua tools ikut ke-install
+RUN bun install
 
 # Copy semua kode server
 COPY . .
 
-# Generate Client Drizzle (PENTING BIAR GAK ERROR SCHEMA)
+# Generate Client Drizzle (Sekarang pasti berhasil karena tools-nya udah ke-install)
 RUN bun run db:generate
 
-# Expose port (Render biasanya pake port dinamis, tapi kita buka 3000)
+# Expose port
 EXPOSE 3000
 
 # Jalankan server
