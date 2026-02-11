@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # Tracking Project v1 - Puchy
+=======
+# 🚀 Tracking Project v1 - Puchy
+>>>>>>> e153250351450b5ad61dc9f8f43f7ac36403e4a1
 
 [![Project Challenge](https://img.shields.io/badge/2026_Challenge-Project_1_of_12-f01036?style=for-the-badge)](https://github.com/emizaff)
 [![Runtime](https://img.shields.io/badge/Runtime-Bun-black?style=for-the-badge&logo=bun)](https://bun.sh)
@@ -99,4 +103,5 @@ Akses dashboard di: ```http://localhost:5173```
   <img src="docs/Logo7.png" alt="Logo Tracking Project" width="35%">
   <br>
   <i>Beberapa Logo dengan variasi warna yang berbeda</i>
+
 </p>
