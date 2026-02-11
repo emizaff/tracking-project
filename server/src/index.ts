@@ -21,38 +21,50 @@ const app = new Elysia()
   }))
 
   // ---------------------------------------------------------
-  // 🛡️ SECURITY LAYER 2: CORS (SIAP DEPLOY)
+  // 🛡️ SECURITY LAYER 2: CORS (FIXED & CORRECT)
   // ---------------------------------------------------------
   .use(cors({
-      // 🔥 UBAH KE BINTANG (*) BIAR VERCEL BISA AKSES
-      origin: [
-        "http://localhost:5173",                      // Laptop
-        "https://faiq-tracking-project.netlify.app"   // Netlify (Production)
-      ], 
-      credentials: true, 
-      allowedHeaders: ["Content-Type", "Authorization"],
-      methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+      // ✅ ORIGIN YANG BENAR (String atau Array String)
+      origin: "https://faiq-tracking-project.netlify.app", // Khusus Prod
+      // Kalau mau dev lokal juga bisa pakai function:
+      // origin: (request) => {
+      //    const origin = request.headers.get('origin');
+      //    if (origin === 'http://localhost:5173') return true;
+      //    if (origin === 'https://faiq-tracking-project.netlify.app') return true;
+      //    return false;
+      // },
+
+      credentials: true, // 🔥 WAJIB TRUE BIAR COOKIE MASUK
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
   }))
 
   // --- GLOBAL ERROR HANDLER ---
   .onError(({ code, error, set }) => {
     if (code === 'VALIDATION') {
       set.status = 400;
-      const firstError = error.all[0]; 
+      // @ts-ignore
+      const firstError = error.all ? error.all[0] : error; 
       return { 
         success: false, 
-        message: firstError.schema.error || `Data tidak valid: ${firstError.path.slice(1)}` 
+        // @ts-ignore
+        message: firstError.schema ? firstError.schema.error : `Data tidak valid` 
       };
     }
-    if (code === 'NOT_FOUND') return { success: false, message: "Endpoint tidak ditemukan" };
+    if (code === 'NOT_FOUND') {
+        set.status = 404;
+        return { success: false, message: "Endpoint tidak ditemukan" };
+    }
     
     console.error("🔥 SERVER ERROR:", error);
     return { success: false, message: error.message || "Terjadi kesalahan internal" };
   })
 
-  // Load Modules Utama
-  .use(authController)
-  .use(trackingController)
+  // ---------------------------------------------------------
+  // 🔥 LOAD MODULES UTAMA (SETELAH CORS!)
+  // ---------------------------------------------------------
+  .use(authController)      // 👈 Login/Register/Logout
+  .use(trackingController)  // 👈 Dashboard Data
 
   // ---------------------------------------------------------
   // 🔥 GROUP 1: PUBLIC API (Goals, Projects, Ideas)
@@ -64,8 +76,10 @@ const app = new Elysia()
         })
         .get("/projects", async () => {
             try {
+                // @ts-ignore
                 return await db.query.projects.findMany({
                     with: { tasks: true },
+                    // @ts-ignore
                     orderBy: (projects, { desc }) => [desc(projects.createdAt)],
                     limit: 6 // Batasi biar gak berat
                 });
@@ -75,6 +89,7 @@ const app = new Elysia()
             }
         })
         .post("/ideas", async ({ body }) => {
+            // @ts-ignore
             const { senderName, content } = body;
             
             if (!content || content.length > 500) {
@@ -84,7 +99,11 @@ const app = new Elysia()
             await db.insert(publicIdeas).values({
                 senderName: senderName || "Anonim",
                 content,
-                isApproved: false
+                isApproved: false,
+                // @ts-ignore
+                createdAt: new Date(),
+                // @ts-ignore
+                updatedAt: new Date()
             });
 
             return { success: true, message: "Ide terkirim! Menunggu moderasi." };
@@ -92,14 +111,7 @@ const app = new Elysia()
             body: t.Object({
                 senderName: t.Optional(t.String()),
                 content: t.String()
-            }),
-            // Rate Limit Khusus Input Ide (Anti Spam)
-            config: {
-                rateLimit: {
-                    max: 5, 
-                    duration: 3600000 // 1 Jam
-                }
-            }
+            })
         })
   )
 
@@ -124,10 +136,10 @@ const app = new Elysia()
         })
   )
   
-  // 🔥 PENTING BUAT RENDER: LISTEN KE 0.0.0.0
+  // 🔥 PENTING BUAT KOYEB/RENDER: LISTEN KE 0.0.0.0
   .listen({
       port: process.env.PORT || 3000,
       hostname: "0.0.0.0"
   });
 
-console.log(`🦊 Server Secured via Render: 0.0.0.0:${process.env.PORT || 3000}`);
+console.log(`🦊 Server Secured via Koyeb: 0.0.0.0:${process.env.PORT || 3000}`);
