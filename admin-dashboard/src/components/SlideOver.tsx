@@ -24,26 +24,28 @@ export default function SlideOver({ isOpen, onClose, title, children }: Props) {
     <div className="fixed inset-0 z-[60] flex justify-end">
       {/* 1. BACKDROP GELAP (Klik untuk tutup) */}
       <div 
-        className={`fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
+        className={`fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
         onClick={onClose}
       ></div>
 
       {/* 2. PANEL SLIDER (Muncul dari kanan) */}
-      <div className={`relative w-full max-w-md bg-slate-800 shadow-2xl border-l border-slate-700 h-full transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      {/* 🔥 UBAH: Background Dark #1A1A1A, Border #333 */}
+      <div className={`relative w-full max-w-md bg-[#1A1A1A] shadow-2xl border-l border-[#333] h-full transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
          
          {/* Header Slide */}
-         <div className="flex items-center justify-between p-6 border-b border-slate-700 bg-slate-800 z-10 relative">
+         <div className="flex items-center justify-between p-6 border-b border-[#333] bg-[#1A1A1A] z-10 relative">
             <h2 className="text-xl font-bold text-white">{title}</h2>
             <button 
                 onClick={onClose} 
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-700 text-slate-400 hover:bg-slate-600 hover:text-white transition"
+                // 🔥 UBAH: Hover jadi Merah Aksen
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#333] text-[#888] hover:bg-[#f01036] hover:text-white transition"
             >
                 <X size={20} />
             </button>
          </div>
 
          {/* Content Scrollable */}
-         <div className="p-6 overflow-y-auto h-[calc(100%-80px)] text-slate-300">
+         <div className="p-6 overflow-y-auto h-[calc(100%-80px)] text-[#ccc] custom-scrollbar">
             {children}
          </div>
       </div>

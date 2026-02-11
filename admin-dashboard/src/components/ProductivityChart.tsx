@@ -7,25 +7,27 @@ interface Props {
 }
 
 export default function ProductivityChart({ data }: Props) {
-  if (!data || data.length === 0) {
+  // Hitung total tasks
+  const totalTasks = data && data.length > 0 ? data.reduce((acc, curr) => acc + curr.total, 0) : 0;
+
+  // Jika data kosong, tampilkan state kosong
+  if (!data || data.length === 0 || totalTasks === 0) {
     return (
-      <div className="h-full min-h-[250px] bg-slate-800 rounded-3xl border border-slate-700 flex flex-col items-center justify-center text-slate-500 p-6 shadow-lg">
-        <BarChart2 size={48} className="mb-3 opacity-50" />
-        <p className="text-sm font-medium text-slate-400">Belum ada data minggu ini.</p>
+      <div className="h-full min-h-[250px] bg-[#1A1A1A] rounded-3xl border border-[#333] flex flex-col items-center justify-center text-[#555] p-6 shadow-lg">
+        <BarChart2 size={48} className="mb-3 opacity-30 text-[#f01036]" />
+        <p className="text-sm font-medium text-[#888]">Belum ada data minggu ini.</p>
         <p className="text-xs">Selesaikan task untuk melihat grafik!</p>
       </div>
     );
   }
 
-  const totalTasks = data.reduce((acc, curr) => acc + curr.total, 0);
-
   return (
-    <div className="bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-lg h-full flex flex-col animate-in fade-in duration-500">
+    <div className="bg-[#1A1A1A] p-6 rounded-3xl border border-[#333] shadow-lg h-full flex flex-col animate-in fade-in duration-500 hover:border-[#f01036]/30 transition-all">
       <div className="mb-2">
-        <h3 className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">Produktivitas 7 Hari</h3>
+        <h3 className="text-[#888] text-[10px] font-bold uppercase tracking-wider mb-1">Produktivitas 7 Hari</h3>
         <div className="flex items-end gap-2">
             <span className="text-4xl font-black text-white">{totalTasks}</span>
-            <span className="text-sm font-bold text-slate-400 mb-1.5">Task Selesai</span>
+            <span className="text-sm font-bold text-[#666] mb-1.5">Task Selesai</span>
         </div>
       </div>
 
@@ -33,52 +35,54 @@ export default function ProductivityChart({ data }: Props) {
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 10, right: 10, left: -25, bottom: 20 }}>
             <defs>
+              {/* GRADIENT MERAH #f01036 */}
               <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/> {/* Indigo Glow */}
-                <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                <stop offset="5%" stopColor="#f01036" stopOpacity={0.3}/> 
+                <stop offset="95%" stopColor="#f01036" stopOpacity={0}/>
               </linearGradient>
             </defs>
             
             {/* Grid Gelap */}
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333" />
             
             <XAxis 
                 dataKey="name" 
                 axisLine={false} 
                 tickLine={false} 
-                tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }} 
+                tick={{ fill: '#666', fontSize: 11, fontWeight: 600 }} 
                 dy={15} 
             />
             <YAxis 
                 axisLine={false} 
                 tickLine={false} 
-                tick={{ fill: '#64748b', fontSize: 11 }} 
+                tick={{ fill: '#444', fontSize: 11 }} 
                 allowDecimals={false}
             />
             
             {/* Tooltip Dark Mode */}
             <Tooltip 
                 contentStyle={{ 
-                    backgroundColor: '#0f172a', // Slate-950
+                    backgroundColor: '#090909', 
                     borderRadius: '12px', 
-                    border: '1px solid #334155', // Slate-700
-                    color: '#f8fafc',
+                    border: '1px solid #333', 
+                    color: '#fff',
                     boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.5)', 
                     fontSize: '12px', 
                     fontWeight: 'bold' 
                 }}
-                itemStyle={{ color: '#818cf8' }} // Text Indigo Light
-                cursor={{ stroke: '#6366f1', strokeWidth: 1, strokeDasharray: '4 4' }}
+                itemStyle={{ color: '#f01036' }} 
+                cursor={{ stroke: '#f01036', strokeWidth: 1, strokeDasharray: '4 4' }}
             />
             
             <Area 
                 type="monotone" 
                 dataKey="total" 
-                stroke="#6366f1" // Indigo-500
+                stroke="#f01036" // MERAH UTAMA
                 strokeWidth={3} 
                 fillOpacity={1} 
                 fill="url(#colorTotal)" 
                 animationDuration={1500}
+                activeDot={{ r: 6, fill: "#fff", stroke: "#f01036", strokeWidth: 2 }}
             />
           </AreaChart>
         </ResponsiveContainer>

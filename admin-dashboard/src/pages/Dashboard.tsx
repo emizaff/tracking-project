@@ -115,7 +115,6 @@ export default function Dashboard() {
     } catch (error) { console.error(error); }
   };
 
-  // 🔥 UPDATE WARNA PROJECT: Menggunakan aksen #f01036 dan variasi warm lainnya
   const getProjectColor = (id: number) => {
       const colors = ['bg-[#f01036]', 'bg-orange-600', 'bg-rose-600', 'bg-red-600', 'bg-[#d00e2e]', 'bg-[#b00b26]'];
       return colors[id % colors.length];
@@ -255,21 +254,27 @@ export default function Dashboard() {
 
       <div className="max-w-7xl mx-auto space-y-8">
         
-        {/* 🔥 HEADER & NAV: DI-UPDATE BIAR TOMBOL GAK ILANG DI MOBILE */}
+        {/* 🔥 HEADER BARU: NAMA & LOGO */}
         <div className="flex flex-col md:flex-row justify-between items-center bg-[#1A1A1A] p-4 md:p-6 rounded-3xl shadow-xl border border-[#333]">
            <div className="flex items-center justify-between w-full md:w-auto gap-3 mb-4 md:mb-0">
                <div className="flex items-center gap-3">
-                   {/* Logo Accent #f01036 */}
-                   <div className="w-12 h-12 bg-[#f01036] rounded-xl flex items-center justify-center text-white shadow-[0_0_15px_rgba(240,16,54,0.4)]">
-                        <LayoutDashboard size={24} />
+                   {/* Logo Container (Logo4.ico) */}
+                   <div className="w-12 h-12 bg-[#222] rounded-xl flex items-center justify-center text-white border border-[#444] shadow-[0_0_15px_rgba(240,16,54,0.15)] overflow-hidden">
+                        {/* Pakai Logo Asli Abang */}
+                        <img 
+                            src="/Logo4.ico" 
+                            alt="Logo" 
+                            className="w-8 h-8 object-contain drop-shadow-[0_0_5px_rgba(240,16,54,0.6)]" 
+                        />
                    </div>
                    <div>
-                       <h1 className="text-xl md:text-3xl font-extrabold text-white tracking-tight">Focus Tracker</h1>
-                       <p className="text-[#888] text-xs md:text-sm">Dashboard Produktivitas</p>
+                       {/* 🔥 NAMA BARU: Tracking Project */}
+                       <h1 className="text-xl md:text-3xl font-extrabold text-white tracking-tight">Tracking Project</h1>
+                       <p className="text-[#888] text-xs md:text-sm">Admin Control Center</p>
                    </div>
                </div>
                
-               {/* Profile Mobile (Muncul di kanan atas di HP) */}
+               {/* Profile Mobile */}
                <div className="md:hidden" onClick={() => navigate('/profile')}>
                     <div className="w-10 h-10 rounded-full overflow-hidden border border-[#444] bg-[#222] flex items-center justify-center">
                         {userLevel?.picture || userLevel?.avatarUrl ? (
@@ -280,19 +285,19 @@ export default function Dashboard() {
            </div>
            
            <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-end">
-               {/* 🔥 TOMBOL LAPORAN (Muncul Icon di Mobile) */}
+               {/* Tombol Laporan */}
                <button onClick={() => navigate('/report')} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-[#222] border border-[#333] text-[#ccc] rounded-xl font-bold hover:bg-[#333] hover:text-white transition group" title="Lihat Laporan">
                  <BarChart3 size={18} className="text-[#f01036] group-hover:text-white transition" />
                  <span className="text-xs md:text-sm">Report</span>
                </button>
 
-               {/* 🔥 TOMBOL INBOX (Muncul Icon di Mobile) */}
+               {/* Tombol Inbox */}
                <button onClick={() => navigate('/inbox')} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-[#222] border border-[#333] text-[#ccc] rounded-xl font-bold hover:bg-[#333] hover:text-white transition group" title="Kotak Masuk">
                  <Inbox size={18} className="text-orange-400 group-hover:text-white transition" />
                  <span className="text-xs md:text-sm">Inbox</span>
                </button>
 
-               {/* Tombol Ngide (Accent) */}
+               {/* Tombol Ngide */}
                <button onClick={() => setIsVaultOpen(true)} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-[#f01036] text-white rounded-xl font-bold hover:bg-[#d00e2e] shadow-[0_0_10px_rgba(240,16,54,0.3)] transition">
                    <Lightbulb size={18} /> <span className="text-xs md:text-sm">Ngide</span>
                </button>

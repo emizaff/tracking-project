@@ -65,7 +65,7 @@ export default function SmartTaskInput({ projectId, onTaskCreated, projectDeadli
           <div className="relative">
               <input 
                 type="text"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-sm font-medium text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition mb-2"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-sm font-medium text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-[#f01036] transition mb-2"
                 placeholder="✍️ Tulis nama task baru..."
                 value={title}
                 onChange={e => setTitle(e.target.value)}

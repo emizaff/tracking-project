@@ -1,9 +1,9 @@
 // src/components/ActivityHeatmap.tsx
 
-import { Flame } from 'lucide-react'; // Gunakan icon Lucide
+import { Flame } from 'lucide-react'; 
 
 interface Props {
-  data: { [date: string]: number }; // Format: { "2026-01-28": 5 }
+  data: { [date: string]: number }; 
 }
 
 export default function ActivityHeatmap({ data }: Props) {
@@ -29,12 +29,12 @@ export default function ActivityHeatmap({ data }: Props) {
   });
   if (currentWeek.length > 0) weeks.push(currentWeek);
 
-  // 🔥 Helper Warna (Dark Mode Version)
+  // 🔥 Helper Warna (RED HEATMAP)
   const getColor = (count: number) => {
-    if (count === 0) return 'bg-slate-700 border-slate-600'; // Kosong (Dark Grey)
-    if (count <= 2) return 'bg-green-900 border-green-800';  // Dikit (Dark Green)
-    if (count <= 5) return 'bg-green-600 border-green-500';  // Sedang (Green)
-    return 'bg-green-400 border-green-300 shadow-[0_0_8px_rgba(74,222,128,0.6)]'; // Banyak (Neon Green + Glow)
+    if (count === 0) return 'bg-[#222] border-[#333]'; // Kosong (Dark Grey)
+    if (count <= 2) return 'bg-[#7f1d1d] border-[#991b1b]';  // Dikit (Red 900)
+    if (count <= 5) return 'bg-[#dc2626] border-[#ef4444]';  // Sedang (Red 600)
+    return 'bg-[#f01036] border-[#fb7185] shadow-[0_0_8px_rgba(240,16,54,0.6)]'; // Banyak (Neon Red + Glow)
   };
 
   const getMonthLabels = () => {
@@ -50,22 +50,23 @@ export default function ActivityHeatmap({ data }: Props) {
   };
 
   return (
-    <div className="bg-slate-800 rounded-3xl p-6 border border-slate-700 shadow-lg overflow-x-auto">
+    // 🔥 UBAH: Background Dark #1A1A1A
+    <div className="bg-[#1A1A1A] rounded-3xl p-6 border border-[#333] shadow-lg overflow-x-auto hover:border-[#f01036]/30 transition-all duration-300">
       <div className="flex justify-between items-end mb-4">
         <div>
             <h3 className="font-extrabold text-white flex items-center gap-2">
-                <Flame className="text-orange-500 fill-orange-500" size={18} /> Konsistensi
+                <Flame className="text-[#f01036] fill-[#f01036]" size={18} /> Konsistensi
             </h3>
-            <p className="text-xs text-slate-400">Jangan biarkan ada hari yang bolong!</p>
+            <p className="text-xs text-[#888]">Jangan biarkan ada hari yang bolong!</p>
         </div>
         
-        {/* Legenda Warna */}
-        <div className="flex items-center gap-2 text-[10px] text-slate-400">
+        {/* Legenda Warna (Merah) */}
+        <div className="flex items-center gap-2 text-[10px] text-[#666]">
             <span>Santai</span>
-            <div className="w-3 h-3 bg-slate-700 rounded-sm border border-slate-600"></div>
-            <div className="w-3 h-3 bg-green-900 rounded-sm border border-green-800"></div>
-            <div className="w-3 h-3 bg-green-600 rounded-sm border border-green-500"></div>
-            <div className="w-3 h-3 bg-green-400 rounded-sm border border-green-300 shadow-sm shadow-green-400/50"></div>
+            <div className="w-3 h-3 bg-[#222] rounded-sm border border-[#333]"></div>
+            <div className="w-3 h-3 bg-[#7f1d1d] rounded-sm border border-[#991b1b]"></div>
+            <div className="w-3 h-3 bg-[#dc2626] rounded-sm border border-[#ef4444]"></div>
+            <div className="w-3 h-3 bg-[#f01036] rounded-sm border border-[#fb7185] shadow-sm shadow-[#f01036]/50"></div>
             <span>Keras</span>
         </div>
       </div>
@@ -75,11 +76,11 @@ export default function ActivityHeatmap({ data }: Props) {
         {/* Label Hari */}
         <div className="flex flex-col gap-1 mr-2 pt-6">
             <span className="text-[9px] text-transparent h-3"></span>
-            <span className="text-[9px] text-slate-500 h-3 leading-3 font-bold">Sen</span>
+            <span className="text-[9px] text-[#666] h-3 leading-3 font-bold">Sen</span>
             <span className="text-[9px] text-transparent h-3"></span>
-            <span className="text-[9px] text-slate-500 h-3 leading-3 font-bold">Rab</span>
+            <span className="text-[9px] text-[#666] h-3 leading-3 font-bold">Rab</span>
             <span className="text-[9px] text-transparent h-3"></span>
-            <span className="text-[9px] text-slate-500 h-3 leading-3 font-bold">Jum</span>
+            <span className="text-[9px] text-[#666] h-3 leading-3 font-bold">Jum</span>
             <span className="text-[9px] text-transparent h-3"></span>
         </div>
 
@@ -90,7 +91,7 @@ export default function ActivityHeatmap({ data }: Props) {
                 {getMonthLabels().map((m, i) => (
                     <span 
                         key={i} 
-                        className="text-[10px] font-bold text-slate-400 absolute"
+                        className="text-[10px] font-bold text-[#666] absolute"
                         style={{ left: `${m.index * 14}px` }} 
                     >
                         {m.name}

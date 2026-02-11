@@ -25,17 +25,18 @@ export default function ActionMenu({ onDelete, onSelect, type = "Task" }: Props)
 
   return (
     <div className="relative" ref={menuRef}>
-      {/* Tombol Titik Tiga (Dark Mode) */}
+      {/* Tombol Titik Tiga (Theme Update) */}
       <button 
         onClick={(e) => { e.stopPropagation(); setIsOpen(!isOpen); }}
-        className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-700 hover:text-white transition"
+        className="w-8 h-8 flex items-center justify-center rounded-lg text-[#888] hover:bg-[#333] hover:text-white transition"
       >
         <MoreVertical size={18} />
       </button>
 
-      {/* Dropdown Menu (Dark Mode) */}
+      {/* Dropdown Menu (Theme Update) */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-1 w-40 bg-slate-800 rounded-xl shadow-xl border border-slate-700 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
+        // 🔥 UBAH: Background Dark #1A1A1A, Border #333
+        <div className="absolute right-0 top-full mt-1 w-40 bg-[#1A1A1A] rounded-xl shadow-xl border border-[#333] z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
             <div className="p-1 flex flex-col gap-0.5">
                 
                 {/* 👇 TOMBOL SELECT */}
@@ -46,9 +47,10 @@ export default function ActionMenu({ onDelete, onSelect, type = "Task" }: Props)
                             setIsOpen(false);
                             onSelect();
                         }}
-                        className="w-full text-left px-3 py-2.5 text-xs text-slate-300 hover:bg-slate-700 hover:text-white rounded-lg flex items-center gap-2 font-medium transition"
+                        className="w-full text-left px-3 py-2.5 text-xs text-[#ccc] hover:bg-[#333] hover:text-white rounded-lg flex items-center gap-2 font-medium transition"
                     >
-                        <CheckSquare size={14} className="text-indigo-400" />
+                        {/* Icon Select jadi Merah Aksen */}
+                        <CheckSquare size={14} className="text-[#f01036]" />
                         Select {type}
                     </button>
                 )}

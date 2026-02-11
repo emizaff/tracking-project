@@ -48,20 +48,21 @@ export default function WishlistWidget({ goals, onAdd, onIncrement, onDelete }: 
   };
 
   return (
-    // 🔥 FIX: Hapus 'h-full' agar widget tidak melar mengikuti tinggi dashboard
-    <div className="bg-slate-800 rounded-3xl border border-slate-700 shadow-lg overflow-hidden flex flex-col w-full">
+    // 🔥 UBAH: Background Dark #1A1A1A, Border #333
+    <div className="bg-[#1A1A1A] rounded-3xl border border-[#333] shadow-lg overflow-hidden flex flex-col w-full hover:border-[#f01036]/30 transition-all duration-300">
       
       {/* Header */}
-      <div className="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-900/50">
+      <div className="p-5 border-b border-[#333] flex justify-between items-center bg-[#222]">
         <div>
            <h3 className="font-extrabold text-white flex items-center gap-2">
               <PiggyBank className="text-amber-400" size={20} /> Loot & Wishlist
            </h3>
-           <p className="text-xs text-slate-400">Target Jajan 2026</p>
+           <p className="text-xs text-[#888]">Target Jajan 2026</p>
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}
-          className={`text-xs px-3 py-2 rounded-lg font-bold transition flex items-center gap-1 border ${isAdding ? 'bg-slate-800 text-slate-300 border-slate-600 hover:bg-slate-700' : 'bg-indigo-600 text-white border-indigo-500 hover:bg-indigo-500 shadow-lg shadow-indigo-500/20'}`}
+          // 🔥 UBAH: Tombol Aksen Merah
+          className={`text-xs px-3 py-2 rounded-lg font-bold transition flex items-center gap-1 border ${isAdding ? 'bg-[#333] text-[#ccc] border-[#444] hover:bg-[#444]' : 'bg-[#f01036] text-white border-[#f01036] hover:bg-[#d00e2e] shadow-lg shadow-[#f01036]/20'}`}
         >
           {isAdding ? <X size={14} /> : <Plus size={14} />}
           {isAdding ? "Batal" : "Item"}
@@ -72,17 +73,17 @@ export default function WishlistWidget({ goals, onAdd, onIncrement, onDelete }: 
       {isAdding && (
         <form onSubmit={handleSubmit} className="p-4 bg-amber-900/10 border-b border-amber-500/20 animate-in slide-in-from-top-2 relative">
            <input 
-             className="w-full text-sm p-2.5 rounded-lg border border-slate-600 mb-2 focus:outline-none focus:border-amber-500 bg-slate-900 text-white placeholder-slate-500"
+             className="w-full text-sm p-2.5 rounded-lg border border-[#444] mb-2 focus:outline-none focus:border-[#f01036] bg-[#222] text-white placeholder-[#666]"
              placeholder="Nama Barang (misal: HP Baru)"
              value={title} onChange={e => setTitle(e.target.value)}
              autoFocus
            />
            <div className="flex gap-2">
               <div className="relative flex-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs font-bold">Rp</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888] text-xs font-bold">Rp</span>
                   <input 
                     type="number"
-                    className="w-full text-sm p-2.5 pl-8 rounded-lg border border-slate-600 focus:outline-none focus:border-amber-500 bg-slate-900 text-white placeholder-slate-500"
+                    className="w-full text-sm p-2.5 pl-8 rounded-lg border border-[#444] focus:outline-none focus:border-[#f01036] bg-[#222] text-white placeholder-[#666]"
                     placeholder="Harga Target"
                     value={price} onChange={e => setPrice(e.target.value)}
                   />
@@ -93,10 +94,9 @@ export default function WishlistWidget({ goals, onAdd, onIncrement, onDelete }: 
       )}
 
       {/* List Barang */}
-      {/* 🔥 FIX: Hapus 'flex-1' dan kurangi max-h jadi 300px */}
       <div className="p-4 space-y-4 overflow-y-auto custom-scrollbar max-h-[300px]">
         {goals.length === 0 && !isAdding && (
-            <div className="text-center text-slate-500 py-8 text-sm flex flex-col items-center gap-2">
+            <div className="text-center text-[#666] py-8 text-sm flex flex-col items-center gap-2">
                 <ShoppingCart size={32} className="opacity-30" />
                 <p>Dompet aman?<br/>Masukin target belanjaanmu! 🛒</p>
             </div>
@@ -107,26 +107,26 @@ export default function WishlistWidget({ goals, onAdd, onIncrement, onDelete }: 
             const isCompleted = goal.isCompleted || percent >= 100;
             
             return (
-            <div key={goal.id} className={`group relative p-3 rounded-xl border transition-all ${isCompleted ? 'bg-green-900/10 border-green-900/30 opacity-70' : 'bg-slate-800 border-slate-700 hover:border-slate-600 hover:bg-slate-700/30'}`}>
+            <div key={goal.id} className={`group relative p-3 rounded-xl border transition-all ${isCompleted ? 'bg-green-900/10 border-green-900/30 opacity-70' : 'bg-[#222] border-[#333] hover:border-[#555] hover:bg-[#2a2a2a]'}`}>
                 {/* Tombol Hapus */}
                 <button 
                     onClick={() => onDelete(goal.id)}
-                    className="absolute top-2 right-2 text-slate-600 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition z-10 hover:bg-slate-900 rounded"
+                    className="absolute top-2 right-2 text-[#666] hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition z-10 hover:bg-[#333] rounded"
                 >
                     <Trash2 size={14} />
                 </button>
 
                 <div className="flex justify-between items-end mb-1">
-                    <span className={`text-sm font-bold truncate max-w-[140px] ${isCompleted ? 'text-green-400 line-through' : 'text-slate-200'}`}>
+                    <span className={`text-sm font-bold truncate max-w-[140px] ${isCompleted ? 'text-green-400 line-through' : 'text-white'}`}>
                         {goal.title}
                     </span>
-                    <span className="text-[10px] font-bold text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-700">
+                    <span className="text-[10px] font-bold text-[#888] bg-[#111] px-2 py-0.5 rounded border border-[#333]">
                         {formatRupiah(goal.targetValue)}
                     </span>
                 </div>
                 
                 {/* Progress Bar Uang */}
-                <div className="h-3 bg-slate-900 rounded-full overflow-hidden relative mb-3 border border-slate-700">
+                <div className="h-3 bg-[#000] rounded-full overflow-hidden relative mb-3 border border-[#333]">
                     <div 
                         className={`h-full transition-all duration-1000 flex items-center justify-end pr-1.5 ${isCompleted ? 'bg-green-500' : 'bg-gradient-to-r from-amber-500 to-yellow-500'}`} 
                         style={{ width: `${percent}%` }}
@@ -139,18 +139,19 @@ export default function WishlistWidget({ goals, onAdd, onIncrement, onDelete }: 
                 {!isCompleted ? (
                     <div className="flex gap-2">
                         <div className="relative flex-1">
-                            <Wallet size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                            <Wallet size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#666]" />
                             <input 
                                 type="number" 
                                 placeholder="Nominal..."
-                                className="w-full text-xs p-2 pl-7 rounded-lg border border-slate-600 bg-slate-900 text-white focus:outline-none focus:border-indigo-500 placeholder-slate-600"
+                                className="w-full text-xs p-2 pl-7 rounded-lg border border-[#444] bg-[#1A1A1A] text-white focus:outline-none focus:border-[#f01036] placeholder-[#555]"
                                 value={savingAmounts[goal.id] || ""}
                                 onChange={(e) => setSavingAmounts({...savingAmounts, [goal.id]: e.target.value})}
                             />
                         </div>
                         <button 
                             onClick={() => handleSave(goal.id)}
-                            className="bg-indigo-600 text-white text-[10px] px-3 rounded-lg font-bold hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-indigo-500/20 flex items-center gap-1 transition"
+                            // 🔥 UBAH: Tombol Tabung pakai Merah/Aksen
+                            className="bg-[#f01036] text-white text-[10px] px-3 rounded-lg font-bold hover:bg-[#d00e2e] disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-[#f01036]/20 flex items-center gap-1 transition"
                             disabled={!savingAmounts[goal.id]}
                         >
                             <Coins size={12} /> Tabung
@@ -162,8 +163,8 @@ export default function WishlistWidget({ goals, onAdd, onIncrement, onDelete }: 
                     </div>
                 )}
                 
-                <div className="text-[10px] text-slate-500 mt-2 text-right">
-                    Terkumpul: <span className="text-slate-300 font-bold">{formatRupiah(goal.currentValue)}</span>
+                <div className="text-[10px] text-[#666] mt-2 text-right">
+                    Terkumpul: <span className="text-white font-bold">{formatRupiah(goal.currentValue)}</span>
                 </div>
             </div>
         )})}
