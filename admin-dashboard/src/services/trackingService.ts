@@ -5,18 +5,30 @@ import { API_BASE_URL } from "../config";
 const API_URL = `${API_BASE_URL}/tracking`;
 const ROOT_API = API_BASE_URL;
 
-// 🔥 Helper Fetcher (Tetap Sama)
+// 🔥 Helper Fetcher (DENGAN AUTO-LOGOUT)
 const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
   try {
     const res = await fetch(endpoint, {
       ...options,
-      credentials: "include", 
+      credentials: "include", // WAJIB: Bawa cookie session
       headers: {
         "Content-Type": "application/json",
         ...options.headers,
       },
     });
 
+    // 🚨 PENJAGA PINTU: Kalau sesi habis/invalid (401)
+    if (res.status === 401) {
+      console.warn("Session expired or unauthorized. Redirecting to login...");
+      
+      // Cek biar gak redirect loop kalau udah di login
+      if (window.location.pathname !== "/login") {
+          window.location.href = "/login"; // Tendang ke Login
+      }
+      return null; // Stop proses biar gak error di component
+    }
+
+    // Handle Error HTTP Lainnya (400, 500, dll)
     if (!res.ok) {
       const errorText = await res.text();
       try {
@@ -27,11 +39,13 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
       }
     }
 
+    // Cek apakah response ada isinya (JSON)
     const contentType = res.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
       return await res.json();
     }
-    return true; 
+    
+    return true; // Sukses tapi gak ada data (misal DELETE)
     
   } catch (error) {
     console.error("Fetch Error:", error);
@@ -56,8 +70,7 @@ export const TrackingService = {
     return await fetchWithAuth(`${API_URL}/projects/${projectId}`, { method: "DELETE" });
   },
 
-  // --- 2. TASKS (🔥 INI YANG SAYA PERBAIKI BIAR GAK ERROR) ---
-  // Kita kembalikan ke parameter terpisah biar SmartTaskInput.tsx gak kaget
+  // --- 2. TASKS ---
   createTask: async (
     arg1: any, 
     title?: string, 
@@ -70,12 +83,10 @@ export const TrackingService = {
   ) => {
     let payload;
 
-    // 🕵️‍♂️ DETEKSI: Apakah arg1 itu Object? (Cara Lama)
+    // 🕵️‍♂️ Logic Overload Parameter
     if (typeof arg1 === 'object' && arg1 !== null) {
         payload = arg1; 
-    } 
-    // 🕵️‍♂️ Kalau bukan Object, berarti dia Angka (Project ID) -> (Cara Baru/Parameter Terpisah)
-    else {
+    } else {
         payload = {
             projectId: arg1,
             title,
@@ -88,7 +99,6 @@ export const TrackingService = {
         };
     }
 
-    // Kirim Payload yang sudah rapi ke Server
     return await fetchWithAuth(`${API_URL}/tasks`, {
       method: "POST",
       body: JSON.stringify(payload),
@@ -117,7 +127,8 @@ export const TrackingService = {
   // --- 3. CALENDAR & STATS ---
   getCalendarData: async (): Promise<CalendarData> => {
     const res = await fetchWithAuth(`${API_URL}/calendar`);
-    if (!res) return { habits: [], deadlines: [] };
+    // Handle kalau null (karena redirect 401)
+    if (!res) return { habits: [], deadlines: [] }; 
     return res;
   },
 
