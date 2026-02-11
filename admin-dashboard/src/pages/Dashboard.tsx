@@ -6,7 +6,6 @@ import type { Project, Task } from '../types';
 
 // Icons
 import { 
-  LayoutDashboard, 
   BarChart3, 
   Inbox, 
   Lightbulb, 
