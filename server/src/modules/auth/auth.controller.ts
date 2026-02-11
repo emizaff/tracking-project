@@ -1,23 +1,23 @@
-    // server/src/modules/auth/auth.controller.ts
-    import { Elysia, t } from "elysia";
-    import { AuthService } from "./auth.service";
-    import { db } from "../../db";
-    import { users, sessions } from "../../db/schema/auth.schema";
-    import { eq } from "drizzle-orm"; 
-    import { v4 as uuidv4 } from "uuid";
+// server/src/modules/auth/auth.controller.ts
+import { Elysia, t } from "elysia";
+import { AuthService } from "./auth.service";
+import { db } from "../../db";
+import { users, sessions } from "../../db/schema/auth.schema";
+import { eq } from "drizzle-orm"; 
+import { v4 as uuidv4 } from "uuid";
 
-    // URL Frontend (React) - Pastikan ini benar
-    const FRONTEND_URL = "https://faiq-tracking-project.netlify.app";
+// URL Frontend (Netlify) - Pastikan ini sesuai
+const FRONTEND_URL = "https://faiq-tracking-project.netlify.app";
 
-    export const authController = new Elysia({ prefix: "/auth" })
+export const authController = new Elysia({ prefix: "/auth" })
     
-    // --- 1. Redirect ke Google ---
+    // --- 1. Redirect ke Google Login Page ---
     .get("/google", ({ redirect }) => {
         const url = AuthService.getGoogleAuthURL();
         return redirect(url);
     })
 
-    // --- 2. Callback Google (Logika Redirect Pintar) ---
+    // --- 2. Callback Google (Logic Redirect Pintar) ---
     .get("/google/callback", async ({ query, cookie, redirect }) => {
         try {
             const code = query.code as string;
@@ -28,14 +28,14 @@
             // A. JIKA SUDAH PUNYA AKUN -> LOGIN LANGSUNG
             if (result.status === 'LOGIN') {
                 
-                // 🔥 FIX UTAMA DISINI:
+                // 🔥 SETTING COOKIE SAKTI (WAJIB BEGINI)
                 cookie.session_id.set({
                     value: result.token!,
                     httpOnly: true,
                     path: "/",
-                    maxAge: 7 * 86400,
-                    sameSite: "none",      // 👈 WAJIB "none" biar bisa nyebrang domain
-                    secure: true,          // 👈 WAJIB "true"
+                    maxAge: 7 * 86400, // 7 Hari
+                    sameSite: "none",      // 👈 WAJIB: Biar bisa nyebrang domain (Netlify -> Koyeb)
+                    secure: true,          // 👈 WAJIB: Karena lewat HTTPS
                 });
 
                 return redirect(`${FRONTEND_URL}/dashboard`);
@@ -62,10 +62,17 @@
     })
 
     // --- 3. Endpoint Register (User Baru) ---
-    .post("/register", async ({ body, cookie }) => {
+    .post("/register", async ({ body, cookie, set }) => {
         const { email, username, password, googleId, picture } = body as any;
 
         try {
+            // Cek duplikasi email dulu biar gak error 500
+            const existingUser = await db.query.users.findFirst({ where: eq(users.email, email) });
+            if (existingUser) {
+                set.status = 400;
+                return { success: false, message: "Email sudah terdaftar!" };
+            }
+
             const [newUser] = await db.insert(users).values({
                 email,
                 username,
@@ -76,6 +83,7 @@
                 xp: 0
             }).returning();
 
+            // Buat Session Baru
             const token = uuidv4();
             const expiresAt = Math.floor(Date.now() / 1000) + (7 * 86400);
             
@@ -85,7 +93,7 @@
                 expiresAt
             });
 
-            // 🔥 FIX COOKIE REGISTER JUGA:
+            // 🔥 SETTING COOKIE REGISTER
             cookie.session_id.set({
                 value: token,
                 httpOnly: true,
@@ -98,6 +106,7 @@
             return { success: true, user: newUser };
         } catch (error: any) {
             console.error("Register Error:", error);
+            set.status = 500;
             return { success: false, message: error.message };
         }
     })
@@ -116,16 +125,13 @@
                 return { success: false, message: "Email tidak terdaftar" };
             }
 
-            if (!user.password && user.googleId) {
-                set.status = 400;
-                return { success: false, message: "Akun ini via Google. Login pake Google dong bang." };
-            }
-
+            // Cek Password Sederhana (Harusnya pake bcrypt/argon2, tapi ini sesuai request awal Abang)
             if (user.password !== password) {
                 set.status = 400;
                 return { success: false, message: "Password salah!" };
             }
 
+            // Buat Session
             const token = uuidv4();
             const expiresAt = Math.floor(Date.now() / 1000) + (7 * 86400); 
             
@@ -135,7 +141,7 @@
                 expiresAt
             });
 
-            // 🔥 FIX COOKIE LOGIN MANUAL JUGA:
+            // 🔥 SETTING COOKIE LOGIN MANUAL
             cookie.session_id.set({
                 value: token,
                 httpOnly: true,
@@ -149,22 +155,43 @@
 
         } catch (error: any) {
             console.error("Login Error:", error);
+            set.status = 500;
             return { success: false, message: "Terjadi kesalahan server" };
         }
     })
 
-    // --- 5. Logout & Get Profile ---
+    // --- 5. Logout (Hapus Cookie & Session DB) ---
     .post("/logout", async ({ cookie }) => {
         if (cookie.session_id.value) {
-            await AuthService.logout(cookie.session_id.value);
-            cookie.session_id.remove();
+            // Hapus dari DB (Optional tapi bagus buat kebersihan)
+            await AuthService.logout(cookie.session_id.value); 
+            
+            // 🔥 HAPUS COOKIE DENGAN SETTING YANG SAMA
+            // Browser gak mau hapus kalau setting secure/samesite-nya beda sama pas login
+            cookie.session_id.set({
+                value: "",
+                httpOnly: true,
+                path: "/",
+                maxAge: 0,             // Langsung Expired
+                sameSite: "none",      // 👈 Harus sama persis
+                secure: true,          // 👈 Harus sama persis
+            });
         }
-        return { success: true };
+        return { success: true, message: "Logout berhasil" };
     })
 
-    .get("/me", async ({ cookie }) => {
-        // Endpoint ini akan aman kalau Cookie sudah masuk
-        if(!cookie.session_id.value) return { user: null };
+    // --- 6. Cek Profile User (Me) ---
+    .get("/me", async ({ cookie, set }) => {
+        if(!cookie.session_id.value) {
+            set.status = 401;
+            return { user: null };
+        }
+        
         const user = await AuthService.getSession(cookie.session_id.value);
+        if (!user) {
+            set.status = 401;
+            return { user: null };
+        }
+        
         return { user };
     });

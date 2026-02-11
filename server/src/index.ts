@@ -3,37 +3,39 @@ import { cors } from "@elysiajs/cors";
 import { rateLimit } from "elysia-rate-limit";
 import { authController } from "./modules/auth/auth.controller";
 import { trackingController } from "./modules/tracking/tracking.controller";
-
-// 🔥 IMPORT DATABASE
 import { db } from "./db";
 import { publicIdeas, goals } from "./db/schema/tracking.schema";
 import { eq, desc } from "drizzle-orm";
 
 const app = new Elysia()
   // ---------------------------------------------------------
-  // 🛡️ SECURITY LAYER 1: RATE LIMIT GLOBAL
+  // 🛡️ SECURITY LAYER 1: RATE LIMIT
   // ---------------------------------------------------------
   .use(rateLimit({
-      duration: 60000, // 1 Menit
-      max: 60,         // Maks 60 request
+      duration: 60000, 
+      max: 60,         
       responseMessage: "Terlalu banyak request. Santai dulu bang! ☕",
       countFailedRequest: true
   }))
 
   // ---------------------------------------------------------
-  // 🛡️ SECURITY LAYER 2: CORS (FIXED & CORRECT)
+  // 🛡️ SECURITY LAYER 2: CORS (FIXED)
   // ---------------------------------------------------------
   .use(cors({
-      // ✅ ORIGIN YANG BENAR (String atau Array String)
-      origin: "https://faiq-tracking-project.netlify.app", // Khusus Prod
-      // Kalau mau dev lokal juga bisa pakai function:
-      // origin: (request) => {
-      //    const origin = request.headers.get('origin');
-      //    if (origin === 'http://localhost:5173') return true;
-      //    if (origin === 'https://faiq-tracking-project.netlify.app') return true;
-      //    return false;
-      // },
-
+      // 🔥 LOGIC: Bolehkan Localhost (Dev) DAN Netlify (Prod)
+      origin: (request: Request) => {
+          const origin = request.headers.get('origin');
+          if (!origin) return true; // Allow non-browser requests (Postman etc)
+          
+          // Daftar Origin yang dibolehkan
+          const allowedOrigins = [
+              "http://localhost:5173",
+              "https://faiq-tracking-project.netlify.app"
+          ];
+          
+          if (allowedOrigins.includes(origin)) return true;
+          return false;
+      },
       credentials: true, // 🔥 WAJIB TRUE BIAR COOKIE MASUK
       allowedHeaders: ['Content-Type', 'Authorization'],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
@@ -55,19 +57,18 @@ const app = new Elysia()
         set.status = 404;
         return { success: false, message: "Endpoint tidak ditemukan" };
     }
-    
     console.error("🔥 SERVER ERROR:", error);
     return { success: false, message: error.message || "Terjadi kesalahan internal" };
   })
 
   // ---------------------------------------------------------
-  // 🔥 LOAD MODULES UTAMA (SETELAH CORS!)
+  // 🔥 LOAD MODULES
   // ---------------------------------------------------------
-  .use(authController)      // 👈 Login/Register/Logout
-  .use(trackingController)  // 👈 Dashboard Data
+  .use(authController)      
+  .use(trackingController)  
 
   // ---------------------------------------------------------
-  // 🔥 GROUP 1: PUBLIC API (Goals, Projects, Ideas)
+  // 🔥 PUBLIC ROUTES
   // ---------------------------------------------------------
   .group("/public", (app) => 
       app
@@ -81,7 +82,7 @@ const app = new Elysia()
                     with: { tasks: true },
                     // @ts-ignore
                     orderBy: (projects, { desc }) => [desc(projects.createdAt)],
-                    limit: 6 // Batasi biar gak berat
+                    limit: 6 
                 });
             } catch (error) {
                 console.error("Error fetching public projects:", error);
@@ -91,32 +92,23 @@ const app = new Elysia()
         .post("/ideas", async ({ body }) => {
             // @ts-ignore
             const { senderName, content } = body;
-            
-            if (!content || content.length > 500) {
-                throw new Error("Isi ide tidak valid atau kepanjangan!");
-            }
+            if (!content || content.length > 500) throw new Error("Isi ide tidak valid!");
 
             await db.insert(publicIdeas).values({
                 senderName: senderName || "Anonim",
                 content,
                 isApproved: false,
                 // @ts-ignore
-                createdAt: new Date(),
-                // @ts-ignore
-                updatedAt: new Date()
+                createdAt: new Date(), updatedAt: new Date()
             });
-
             return { success: true, message: "Ide terkirim! Menunggu moderasi." };
         }, {
-            body: t.Object({
-                senderName: t.Optional(t.String()),
-                content: t.String()
-            })
+            body: t.Object({ senderName: t.Optional(t.String()), content: t.String() })
         })
   )
 
   // ---------------------------------------------------------
-  // 🔥 GROUP 2: ADMIN API (Untuk Halaman Inbox / Moderasi)
+  // 🔥 ADMIN ROUTES
   // ---------------------------------------------------------
   .group("/admin", (app) => 
       app
@@ -124,19 +116,15 @@ const app = new Elysia()
             return await db.select().from(publicIdeas).orderBy(desc(publicIdeas.createdAt));
         })
         .patch("/ideas/:id/approve", async ({ params }) => {
-            await db.update(publicIdeas)
-                .set({ isApproved: true })
-                .where(eq(publicIdeas.id, Number(params.id)));
+            await db.update(publicIdeas).set({ isApproved: true }).where(eq(publicIdeas.id, Number(params.id)));
             return { success: true, message: "Ide disetujui!" };
         })
         .delete("/ideas/:id", async ({ params }) => {
-            await db.delete(publicIdeas)
-                .where(eq(publicIdeas.id, Number(params.id)));
+            await db.delete(publicIdeas).where(eq(publicIdeas.id, Number(params.id)));
             return { success: true, message: "Ide dihapus!" };
         })
   )
   
-  // 🔥 PENTING BUAT KOYEB/RENDER: LISTEN KE 0.0.0.0
   .listen({
       port: process.env.PORT || 3000,
       hostname: "0.0.0.0"
