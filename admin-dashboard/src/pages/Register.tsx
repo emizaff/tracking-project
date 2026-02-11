@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom'; // Pake useNavigate biar lebih React-way
 import { User, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
+import { AuthService } from '../services/authService'; // 👈 1. Import Service
 
 export default function Register() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate(); // Buat redirect
   
   const [formData, setFormData] = useState({
     email: '',
@@ -37,19 +39,15 @@ export default function Register() {
     setLoading(true);
 
     try {
-      // Tembak ke Backend untuk simpan user baru
-      const res = await fetch('http://localhost:3000/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
+      // ❌ HAPUS FETCH MANUAL
+      // const res = await fetch('http://localhost:3000/auth/register', ...)
 
-      const data = await res.json();
-      
-      if (!res.ok) throw new Error(data.message || "Gagal daftar");
+      // ✅ GANTI JADI PANGGIL SERVICE
+      await AuthService.register(formData);
 
       // Kalau sukses, lempar ke Dashboard
-      window.location.href = '/dashboard'; 
+      // window.location.href = '/dashboard'; // Cara lama (Refresh page)
+      navigate('/dashboard'); // Cara React (Lebih smooth)
       
     } catch (error) {
       alert(error instanceof Error ? error.message : "Terjadi kesalahan");
@@ -97,7 +95,7 @@ export default function Register() {
             </div>
           </div>
 
-          {/* Password (Optional jika login Google, tapi bagus buat jaga2) */}
+          {/* Password */}
           <div className="space-y-2">
             <label className="text-xs font-medium text-slate-400 uppercase">Buat Password Baru</label>
             <div className="relative">

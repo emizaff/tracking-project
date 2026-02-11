@@ -1,7 +1,10 @@
+// src/pages/Profile.tsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrackingService } from '../services/trackingService';
+import { AuthService } from '../services/authService'; // 👈 1. Import Service Auth
 import BackupModal from '../components/BackupModal';
+import LogoutModal from '../components/LogoutModal'; // 👈 2. Import Modal Logout Ganteng
 import { 
     ChevronLeft, 
     Save, 
@@ -10,13 +13,14 @@ import {
     Trophy, 
     User,
     Shield,
-    LogOut // 👇 Tambah Icon Logout
+    LogOut 
 } from 'lucide-react';
 
 export default function Profile() {
   const navigate = useNavigate();
   const [level, setLevel] = useState<any>(null);
   const [backupOpen, setBackupOpen] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false); // 👈 State buat buka/tutup modal logout
 
   useEffect(() => {
     const fetchLevel = async () => {
@@ -28,19 +32,14 @@ export default function Profile() {
     fetchLevel();
   }, []);
 
-  // 👇 Fungsi Logout
-  const handleLogout = async () => {
-    const confirm = window.confirm("Yakin mau logout?");
-    if (!confirm) return;
-
+  // 👇 Fungsi Eksekusi Logout (Dipanggil sama Modal)
+  const handleLogoutConfirm = async () => {
     try {
-        await fetch('http://localhost:3000/auth/logout', { 
-            method: 'POST',
-            credentials: 'include' // PENTING: Bawa cookie biar server tau siapa yg logout
-        });
-        window.location.href = '/'; // Balik ke Login
+        await AuthService.logout(); // ✅ Pake Service (Aman CORS & Cookie)
+        window.location.href = '/login'; // Redirect paksa biar bersih
     } catch (error) {
         console.error("Gagal logout", error);
+        alert("Gagal logout, coba refresh halaman.");
     }
   };
 
@@ -55,14 +54,21 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-[#0f172a] p-4 flex items-center justify-center font-sans">
-        {/* Render Modal Backup */}
+        
+        {/* 👇 Render Modal Backup */}
         <BackupModal isOpen={backupOpen} onClose={() => setBackupOpen(false)} onSuccess={() => alert('Data berhasil direstore!')} />
+
+        {/* 👇 Render Modal Logout (Ganteng!) */}
+        <LogoutModal 
+            isOpen={logoutOpen} 
+            onClose={() => setLogoutOpen(false)} 
+            onConfirm={handleLogoutConfirm} 
+        />
 
         <div className="max-w-md w-full bg-slate-800 rounded-3xl shadow-2xl overflow-hidden border border-slate-700 relative">
             
             {/* Header Gradient */}
             <div className="bg-gradient-to-br from-indigo-900 to-purple-900 p-8 text-center text-white relative">
-                {/* Decoration */}
                 <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
                 
                 {/* Back Button */}
@@ -73,9 +79,9 @@ export default function Profile() {
                     <ChevronLeft size={20} />
                 </button>
 
-                {/* 👇 Logout Button (Baru) */}
+                {/* 👇 Logout Button (Memicu Modal) */}
                 <button 
-                    onClick={handleLogout} 
+                    onClick={() => setLogoutOpen(true)} 
                     className="absolute top-4 right-4 p-2 bg-red-500/20 hover:bg-red-500/40 rounded-full transition text-red-200 hover:text-white backdrop-blur-sm"
                     title="Logout"
                 >
