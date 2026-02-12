@@ -30,6 +30,7 @@ const app = new Elysia()
           // Daftar Origin yang dibolehkan
           const allowedOrigins = [
               "http://localhost:5173",
+              'https://tracking-project-public.netlify.app',
               "https://faiq-tracking-project.netlify.app"
           ];
           
@@ -66,6 +67,7 @@ const app = new Elysia()
   // ---------------------------------------------------------
   .use(authController)      
   .use(trackingController)  
+  .use(publicController)
 
   // ---------------------------------------------------------
   // 🔥 PUBLIC ROUTES

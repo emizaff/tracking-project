@@ -1,115 +1,93 @@
 ---
-import AuthLayout from '../layouts/AuthLayout.astro';
-
-// Import Komponen React
+// web-public/src/pages/index.astro
 import PublicProjectList from '../components/PublicProjectList';
-import PublicGoalList from '../components/PublicGoalList';
 import PublicIdeaForm from '../components/PublicIdeaForm';
-
-// Pindahkan logika Date ke sini untuk menghindari error TS di template
-const currentYear = new Date().getFullYear();
+import { Toaster } from 'sonner';
+import '../styles/global.css';
 ---
 
-<AuthLayout title="Mewujudkan Mimpi | Public Roadmap">
-    <main class="min-h-screen selection:bg-[#f01036]/30 selection:text-white">
-        
-        <!-- HERO SECTION -->
-        <section class="relative pt-24 pb-32 overflow-hidden border-b border-[#1A1A1A]">
-            <!-- Red Glow Background Decor -->
-            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-96 bg-[#f01036]/10 blur-[120px] rounded-full -z-10"></div>
+<html lang="id" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Tracking Project - Showcase & Ideas</title>
+    <meta name="description" content="Platform monitoring proyek transparan dan pengumpulan ide publik." />
+  </head>
+  <body class="bg-slate-950 text-slate-200 antialiased selection:bg-purple-500/30">
+    <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950 -z-10"></div>
+    
+    <Toaster client:load position="top-center" theme="dark" />
 
-            <div class="max-w-4xl mx-auto px-6 relative z-10 text-center">
-                <!-- Badge 12 Project Challenge -->
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1A1A1A] border border-[#333] backdrop-blur-md text-[#f01036] text-[10px] font-black uppercase tracking-widest mb-8 animate-pulse">
-                    <span class="w-2 h-2 rounded-full bg-[#f01036]"></span>
-                    12 Projects Challenge: 1 of 12
-                </div>
-                
-                <h1 class="text-5xl md:text-7xl font-black text-white mb-6 leading-tight tracking-tight">
-                    Mewujudkan <span class="text-[#f01036] drop-shadow-[0_0_15px_rgba(240,16,54,0.4)]">Mimpi</span> <br class="hidden md:block" />
-                    Menjadi Nyata.
-                </h1>
-                
-                <p class="text-lg md:text-xl text-[#888] max-w-2xl mx-auto leading-relaxed mb-10 font-medium">
-                    Selamat datang di dashboard publik saya. Di sini kalian bisa memantau perkembangan project yang sedang saya kerjakan secara real-time.
-                </p>
-
-                <div class="flex flex-wrap justify-center gap-4">
-                    <a href="#projects" class="px-10 py-4 bg-[#f01036] hover:bg-[#d00e2e] text-white rounded-2xl font-bold transition-all shadow-[0_0_20px_rgba(240,16,54,0.3)] hover:scale-105 active:scale-95">
-                        Lihat Project 🚀
-                    </a>
-                    <a href="#ideas" class="px-10 py-4 bg-[#1A1A1A] hover:bg-[#222] text-[#ccc] border border-[#333] rounded-2xl font-bold transition-all">
-                        Kirim Ide 💡
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <div class="max-w-6xl mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-3 gap-16">
-            
-            <!-- SECTION 1: PROJECT AKTIF (KIRI/UTAMA) -->
-            <section id="projects" class="lg:col-span-2 space-y-10">
-                <div class="flex flex-col gap-2 mb-10">
-                    <h2 class="text-3xl font-black text-white flex items-center gap-3">
-                        <span class="w-8 h-1 bg-[#f01036] rounded-full"></span> Active Projects
-                    </h2>
-                    <p class="text-[#666] font-medium">Inisiatif yang sedang dikembangkan saat ini.</p>
-                </div>
-                
-                <PublicProjectList client:load />
-            </section>
-
-            <!-- SIDEBAR: GOALS & IDEA FORM (KANAN) -->
-            <aside class="space-y-20">
-                
-                <!-- SECTION 2: GOALS / WISHLIST -->
-                <section id="goals">
-                    <div class="flex flex-col gap-2 mb-8">
-                        <h2 class="text-xl font-black text-white flex items-center gap-3">
-                            <span class="text-[#f01036]">#</span> Goals & Rewards
-                        </h2>
-                        <p class="text-xs text-[#666] font-medium">Target pribadi dan reward pencapaian.</p>
-                    </div>
-
-                    <div class="bg-[#1A1A1A]/50 p-6 rounded-3xl border border-[#333]">
-                        <PublicGoalList client:visible />
-                    </div>
-                </section>
-
-                <!-- SECTION 3: IDEA FORM -->
-                <section id="ideas" class="pt-10 border-t border-[#1A1A1A]">
-                    <div class="flex flex-col gap-2 mb-6">
-                        <h2 class="text-xl font-black text-white flex items-center gap-3">
-                            <span class="text-[#f01036]">#</span> Feed the Engine
-                        </h2>
-                        <p class="text-xs text-[#666] font-medium">Punya saran fitur atau ide gila?</p>
-                    </div>
-
-                    <div class="bg-[#1A1A1A] p-6 rounded-3xl border border-[#333] shadow-xl">
-                        <PublicIdeaForm client:visible />
-                    </div>
-                </section>
-
-            </aside>
+    <nav class="sticky top-0 z-50 border-b border-white/5 bg-slate-950/80 backdrop-blur-md">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center gap-3">
+            <a href="/" class="group relative">
+               <div class="absolute -inset-2 bg-purple-500/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+               <img 
+                src="/favicon.svg" 
+                alt="Logo" 
+                class="h-8 w-8 relative z-10 transition-all duration-300 group-hover:drop-shadow-[0_0_15px_rgba(168,85,247,0.8)] group-hover:scale-110"
+              />
+            </a>
+            <span class="font-bold text-lg tracking-tight text-slate-100">
+              Tracking<span class="text-purple-500">Project</span>
+            </span>
+          </div>
+          <div class="flex items-center gap-6">
+            <a href="/about" class="text-sm font-medium text-slate-400 hover:text-purple-400 transition-colors">About</a>
+            <a href="#projects" class="text-sm font-medium text-slate-400 hover:text-purple-400 transition-colors">Projects</a>
+            <a href="#ideas" class="text-sm font-medium text-slate-400 hover:text-purple-400 transition-colors">Submit Idea</a>
+          </div>
         </div>
+      </div>
+    </nav>
 
-        <!-- FOOTER -->
-        <footer class="py-16 border-t border-[#1A1A1A] text-center bg-[#050505]">
-            <div class="flex flex-col items-center gap-6">
-                <img src="/Logo8.png" alt="Logo" class="w-10 h-10 grayscale opacity-20" />
-                <div class="space-y-2">
-                    <p class="text-[#444] text-[10px] font-black uppercase tracking-[0.4em]">
-                        Built with <span class="text-[#f01036]">Astro</span> & <span class="text-[#ccc]">Elysia</span>
-                    </p>
-                    <p class="text-[#333] text-[9px] font-bold">
-                        &copy; {currentYear} Tracking Project &bull; Project 01
-                    </p>
-                </div>
-                <div class="flex gap-6">
-                    <a href="/login" class="text-[#444] hover:text-[#f01036] transition-colors text-xs font-bold uppercase tracking-widest">Admin Login</a>
-                </div>
-            </div>
-        </footer>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-20">
+      
+      <section class="text-center space-y-6 py-10 relative">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-purple-600/20 blur-[100px] -z-10 rounded-full pointer-events-none"></div>
+        
+        <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6">
+          Build in <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Public</span>.
+        </h1>
+        <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          Lihat perkembangan proyek terbaru secara transparan dan berkontribusi dengan ide-ide kreatif Anda.
+        </p>
+      </section>
+
+      <section id="projects" class="scroll-mt-24">
+        <div class="flex items-center justify-between mb-10">
+          <div>
+            <h2 class="text-3xl font-bold text-white mb-2">Active Projects</h2>
+            <p class="text-slate-400">Memantau progress pengembangan secara realtime.</p>
+          </div>
+        </div>
+        
+        <PublicProjectList client:visible />
+      </section>
+
+      <section id="ideas" class="scroll-mt-24 max-w-2xl mx-auto">
+        <div class="text-center mb-10">
+          <h2 class="text-3xl font-bold text-white mb-3">Punya Ide Menarik?</h2>
+          <p class="text-slate-400">Kirimkan saran fitur atau ide proyek baru. Kami mendengarkan.</p>
+        </div>
+        
+        <div class="bg-slate-900/50 border border-white/5 rounded-2xl p-6 md:p-8 backdrop-blur-sm shadow-2xl">
+          <PublicIdeaForm client:visible />
+        </div>
+      </section>
 
     </main>
-</AuthLayout>
+
+    <footer class="border-t border-white/5 bg-slate-950 py-12 mt-12">
+      <div class="max-w-7xl mx-auto px-4 text-center">
+        <p class="text-slate-500 text-sm">
+          &copy; {new Date().getFullYear()} Tracking Project. Built with Astro & React.
+        </p>
+        </div>
+    </footer>
+  </body>
+</html>
