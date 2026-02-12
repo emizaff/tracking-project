@@ -1,53 +1,70 @@
-# 🚀 Tracking Project v1 
+# 🚀 Tracking Project v1
 
 [![Project Challenge](https://img.shields.io/badge/2026_Challenge-Project_1_of_12-f01036?style=for-the-badge)](https://github.com/emizaff)
-[![Runtime](https://img.shields.io/badge/Runtime-Bun-black?style=for-the-badge&logo=bun)](https://bun.sh)
+[![Runtime](https://img.shields.io/badge/Runtime-Bun_v1.2-black?style=for-the-badge&logo=bun)](https://bun.sh)
 [![Environment](https://img.shields.io/badge/OS-WSL_Ubuntu-orange?style=for-the-badge&logo=ubuntu)](https://ubuntu.com)
+[![Status](https://img.shields.io/badge/Status-Live_Production-success?style=for-the-badge&logo=netlify)](https://tracking-project-public.netlify.app)
 
+**Tracking Project** adalah platform manajemen produktivitas modern yang menggabungkan elemen **Gamifikasi RPG** (Level/XP) dengan pelacakan tugas real-time. Proyek ini dibangun sebagai pembuka dari resolusi tantangan **12 Project dalam 1 Tahun (2026)**.
 
-**Tracking Project** adalah project manajemen produktivitas modern yang menggabungkan elemen RPG (Level/XP) dengan pelacakan tugas real-time. Proyek ini dibangun sebagai bagian dari resolusi tantangan **12 Project dalam 1 Tahun (2026)**.
+Tujuan utamanya bukan hanya mencatat tugas, tapi membangun ekosistem kerja yang imersif, transparan, dan memotivasi.
 
 <p align="center">
-  <img src="docs/tracking-project-dashboard.jpeg" alt="Tracking Project Gamified Dashboard Preview" width="100%">
+  <img src="docs/tracking-project-dashboard.jpeg" alt="Tracking Project Gamified Dashboard Preview" width="100%" style="border-radius: 10px; box-shadow: 0 0 20px rgba(240, 16, 54, 0.2);">
   <br>
-  <i>Tampilan Dashboard Utama</i>
+  <i>Tampilan Dashboard Admin (Dark Mode)</i>
 </p>
 
 ---
 
-## 🎭 Tentang Proyek (About)
-Proyek ini lahir dari keinginan untuk membuat fitur CRUD sesuai keinginan pribadi sebagai tracking dari resolusi. Fokus utamanya adalah membangun ekosistem kerja yang imersif di lingkungan **WSL (Windows Subsystem for Linux)** dengan efisiensi tinggi menggunakan **Bun**.
+## 🌐 Live Demo
 
+| Portal | URL | Deskripsi |
+| :--- | :--- | :--- |
+| **Public Showcase** | [tracking-project-public.netlify.app](https://tracking-project-public.netlify.app) | Halaman publik untuk melihat progress proyek & kirim ide. |
+| **Admin Dashboard** | [tracking-project-admin.netlify.app](https://tracking-project-admin.netlify.app) | Pusat kontrol manajemen tugas (Login Required). |
 
 ---
 
 ## ✨ Fitur Unggulan
-- **RPG Leveling System:** Setiap tugas yang selesai memberikan XP untuk menaikkan level user.
-- **Activity Heatmap:** Visualisasi konsistensi kerja 120 hari terakhir ala kontribusi GitHub.
-- **Smart Task Management:** Input tugas cepat dengan mode **Timer (Fokus)** atau **Counter (Jumlah)**.
-- **Loot & Wishlist:** Sistem tabungan otomatis untuk melacak progress pembelian barang impian.
-- **Interactive Reports:** Analisis mendalam mengenai jam fokus dan rasio penyelesaian tugas mingguan.
-- **Admin Control Center:** Dashboard privat untuk mengelola seluruh data proyek secara aman.
+
+### 🎮 Gamifikasi & Produktivitas
+- **RPG Leveling System:** Dapatkan XP setiap menyelesaikan tugas. Naik level untuk membuka *achievement* personal.
+- **Activity Heatmap:** Visualisasi konsistensi kerja 365 hari terakhir ala kontribusi GitHub.
+- **Smart Task Input:** Input tugas cepat dengan mode **Timer (Fokus)** atau **Counter (Jumlah Repetisi)**.
+- **Side Quests (Loot):** Sistem tabungan otomatis visual untuk melacak progress pembelian barang impian (Wishlist).
+
+### 📊 Analisis & Laporan
+- **Interactive Reports:** Grafik mingguan untuk memantau jam fokus dan rasio penyelesaian tugas.
+- **Focus Session:** Mode "Deep Work" dengan timer terintegrasi.
+
+### 🌍 Build in Public
+- **Public API:** Endpoint khusus untuk menampilkan data proyek terpilih ke halaman publik.
+- **Idea Submission:** Fitur bagi pengunjung anonim untuk mengirimkan ide proyek liar kepada developer.
 
 ---
 
 ## 🛠️ Tech Stack
+
+Dibangun dengan performa tinggi menggunakan ekosistem modern:
+
 - **Runtime:** [Bun](https://bun.sh) (Fast JavaScript runtime & package manager).
-- **Backend:** [Elysia.js](https://elysiajs.com) & [Drizzle ORM](https://orm.drizzle.team).
-- **Database:** PostgreSQL (Hosted on [Neon DB](https://neon.tech)).
-- **Frontend Dashboard:** [React 18](https://reactjs.org) (Vite) & [Tailwind CSS](https://tailwindcss.com).
-- **Web Public:** [Astro](https://astro.build) (Static Site Generation - Coming Soon).
+- **Backend:** [Elysia.js](https://elysiajs.com) (Framework server super cepat).
+- **Database:** PostgreSQL (Hosted on [Neon DB](https://neon.tech)) + [Drizzle ORM](https://orm.drizzle.team).
+- **Frontend Admin:** [React 18](https://reactjs.org) (Vite) + [Tailwind CSS](https://tailwindcss.com).
+- **Frontend Public:** [Astro v5](https://astro.build) (Static Site Generation untuk SEO & Speed).
+- **Deployment:** [Koyeb](https://koyeb.com) (Server) & [Netlify](https://netlify.com) (Client).
 
 ---
 
 ## 📥 Panduan Instalasi (Local Development)
 
-Pastikan Anda menjalankan perintah ini di dalam lingkungan **WSL (Ubuntu)**.
+Pastikan Anda menjalankan perintah ini di dalam lingkungan **WSL (Ubuntu)** untuk kompatibilitas terbaik dengan Bun.
 
-### 1. Install Bun
-Jika belum ada, install Bun terlebih dahulu:
+### 1. Prasyarat
+Install Bun jika belum ada:
 ```bash
-curl -fsSL [https://bun.sh/install](https://bun.sh/install)
+curl -fsSL [https://bun.sh/install](https://bun.sh/install) 
 ```
 ### 2. Clone Repository
 ```bash
