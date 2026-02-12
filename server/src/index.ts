@@ -19,25 +19,24 @@ const app = new Elysia()
   }))
 
   // ---------------------------------------------------------
-  // 🛡️ SECURITY LAYER 2: CORS (FIXED)
+  // 🛡️ SECURITY LAYER 2: CORS
   // ---------------------------------------------------------
   .use(cors({
-      // 🔥 LOGIC: Bolehkan Localhost (Dev) DAN Netlify (Prod)
       origin: (request: Request) => {
           const origin = request.headers.get('origin');
-          if (!origin) return true; // Allow non-browser requests (Postman etc)
+          if (!origin) return true; // Allow non-browser requests
           
-          // Daftar Origin yang dibolehkan
+          // Daftar URL yang dibolehkan (Localhost + Netlify Public + Netlify Admin)
           const allowedOrigins = [
               "http://localhost:5173",
-              'https://tracking-project-public.netlify.app',
-              "https://faiq-tracking-project.netlify.app"
+              "https://tracking-project-public.netlify.app", 
+              "https://tracking-project-admin.netlify.app"
           ];
           
           if (allowedOrigins.includes(origin)) return true;
           return false;
       },
-      credentials: true, // 🔥 WAJIB TRUE BIAR COOKIE MASUK
+      credentials: true,
       allowedHeaders: ['Content-Type', 'Authorization'],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
   }))
@@ -67,10 +66,10 @@ const app = new Elysia()
   // ---------------------------------------------------------
   .use(authController)      
   .use(trackingController)  
-  .use(publicController)
+  // ❌ SAYA HAPUS baris .use(publicController) disini karena itu yang bikin error
 
   // ---------------------------------------------------------
-  // 🔥 PUBLIC ROUTES
+  // 🔥 PUBLIC ROUTES (Logic Langsung Disini)
   // ---------------------------------------------------------
   .group("/public", (app) => 
       app
