@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 
 // URL Frontend (Netlify) - Pastikan ini sesuai
-const FRONTEND_URL = "https://faiq-tracking-project.netlify.app";
+const FRONTEND_URL = "https://tracking-project-admin.netlify.app";
 
 export const authController = new Elysia({ prefix: "/auth" })
     
