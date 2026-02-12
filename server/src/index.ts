@@ -1,3 +1,4 @@
+//server\src\index.ts
 import { Elysia, t } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { rateLimit } from "elysia-rate-limit";
@@ -7,7 +8,15 @@ import { db } from "./db";
 import { publicIdeas, goals } from "./db/schema/tracking.schema";
 import { eq, desc } from "drizzle-orm";
 
-const app = new Elysia()
+const app = new Elysia({
+    cookie: {
+        httpOnly: true,
+        secure: true,      
+        sameSite: 'none',  
+        path: '/',         
+        maxAge: 7 * 86400  
+    }
+})
   // ---------------------------------------------------------
   // 🛡️ SECURITY LAYER 1: RATE LIMIT
   // ---------------------------------------------------------
