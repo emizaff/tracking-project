@@ -6,17 +6,32 @@ import { AuthService } from "../auth/auth.service"; // Import Auth Service
 export const trackingController = new Elysia({ prefix: "/tracking" })
 
   // 🔥 MIDDLEWARE: Cek Login Dulu
-  .derive(async ({ cookie, set }) => {
-    if (!cookie.session_id?.value) {
-      set.status = 401;
-      throw new Error("Unauthorized");
+// 🔥 MIDDLEWARE: Cek Login (Support Cookie & Header)
+  .derive(async ({ cookie, headers, set }) => {
+    // 1. Coba ambil token dari Cookie (Cara Lama)
+    let token = cookie.session_id?.value;
+
+    // 2. Jika di Cookie kosong, coba ambil dari Header (Cara Baru Anti-Blokir)
+    if (!token) {
+        const authHeader = headers['authorization'];
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            token = authHeader.split(' ')[1]; // Ambil token setelah kata "Bearer"
+        }
     }
-    // Ambil User ID dari Session
-    const user = await AuthService.getSession(cookie.session_id.value);
+
+    // 3. Validasi: Jika Token tidak ada di keduanya -> Error
+    if (!token) {
+      set.status = 401;
+      throw new Error("Unauthorized: Token Missing");
+    }
+
+    // 4. Cek Session di Database
+    const user = await AuthService.getSession(token);
     if (!user) {
         set.status = 401;
         throw new Error("Session Expired");
     }
+
     return { user }; // User sekarang tersedia di setiap request
   })
 

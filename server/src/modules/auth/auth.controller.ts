@@ -103,7 +103,7 @@ export const authController = new Elysia({ prefix: "/auth" })
                 secure: true,          // 👈 WAJIB
             });
 
-            return { success: true, user: newUser };
+            return { success: true, user: newUser, token };
         } catch (error: any) {
             console.error("Register Error:", error);
             set.status = 500;
@@ -151,7 +151,7 @@ export const authController = new Elysia({ prefix: "/auth" })
                 secure: true,          // 👈 WAJIB
             });
 
-            return { success: true, user };
+            return { success: true, user, token };
 
         } catch (error: any) {
             console.error("Login Error:", error);

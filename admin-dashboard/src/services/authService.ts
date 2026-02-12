@@ -20,6 +20,10 @@ export const AuthService = {
             if (!response.ok) {
                 throw new Error(data.message || "Email atau password salah");
             }
+            // 🔥 SIMPAN TOKEN KE LOCAL STORAGE
+        if (data.token) {
+            localStorage.setItem("auth_token", data.token);
+        }
 
             return data;
         } catch (error) {
@@ -39,6 +43,10 @@ export const AuthService = {
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.message || "Gagal daftar");
+            // 🔥 SIMPAN TOKEN KE LOCAL STORAGE
+        if (data.token) {
+            localStorage.setItem("auth_token", data.token);
+        }
             return data;
         } catch (error) {
             console.error("Register Error:", error);
@@ -54,6 +62,7 @@ export const AuthService = {
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
             });
+            localStorage.removeItem("auth_token");
             return true;
         } catch (error) {
             console.error("Logout Error:", error);

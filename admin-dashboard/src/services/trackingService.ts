@@ -5,30 +5,44 @@ import { API_BASE_URL } from "../config";
 const API_URL = `${API_BASE_URL}/tracking`;
 const ROOT_API = API_BASE_URL;
 
-// 🔥 Helper Fetcher (DENGAN AUTO-LOGOUT)
+// 🔥 Helper Fetcher (UPDATED: Support Bearer Token)
 const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
   try {
-    const res = await fetch(endpoint, {
-      ...options,
-      credentials: "include", // WAJIB: Bawa cookie session
-      headers: {
+    // 👇 1. AMBIL TOKEN DARI SAKU (Local Storage)
+    const token = localStorage.getItem("auth_token");
+
+    // 👇 2. SIAPKAN HEADER
+    const headers: any = {
         "Content-Type": "application/json",
         ...options.headers,
-      },
+    };
+
+    // 👇 3. TEMPELKAN TOKEN KE HEADER (Jika ada)
+    // Ini kuncinya! Biar server tau siapa kita meski cookie diblokir browser.
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(endpoint, {
+      ...options,
+      headers, // 👈 Gunakan headers yang sudah ada tokennya
+      credentials: "include", // Tetap bawa cookie sebagai cadangan
     });
 
     // 🚨 PENJAGA PINTU: Kalau sesi habis/invalid (401)
     if (res.status === 401) {
       console.warn("Session expired or unauthorized. Redirecting to login...");
       
-      // Cek biar gak redirect loop kalau udah di login
+      // Hapus token kadaluarsa biar bersih
+      localStorage.removeItem("auth_token"); 
+
       if (window.location.pathname !== "/login") {
-          window.location.href = "/login"; // Tendang ke Login
+          window.location.href = "/login"; 
       }
-      return null; // Stop proses biar gak error di component
+      return null; 
     }
 
-    // Handle Error HTTP Lainnya (400, 500, dll)
+    // Handle Error HTTP Lainnya
     if (!res.ok) {
       const errorText = await res.text();
       try {
@@ -39,13 +53,12 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
       }
     }
 
-    // Cek apakah response ada isinya (JSON)
     const contentType = res.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
       return await res.json();
     }
     
-    return true; // Sukses tapi gak ada data (misal DELETE)
+    return true; 
     
   } catch (error) {
     console.error("Fetch Error:", error);
@@ -53,9 +66,10 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
   }
 };
 
+// ... (Sisa kode ke bawah exports TrackingService TETAP SAMA, tidak perlu diubah)
 export const TrackingService = {
-  // --- 1. PROJECTS ---
-  getProjects: async (): Promise<Project[]> => {
+  // ... copy paste sisa fungsinya dari kodemu sebelumnya ...
+    getProjects: async (): Promise<Project[]> => {
     return await fetchWithAuth(`${API_URL}/projects`);
   },
 
