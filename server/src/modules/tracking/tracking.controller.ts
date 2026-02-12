@@ -3,7 +3,7 @@ import { Elysia, t } from "elysia";
 import { TrackingService } from "./tracking.service";
 import { AuthService } from "../auth/auth.service"; // Import Auth Service
 
-export const trackingController = new Elysia({ prefix: "/tracking" })
+export const trackingController = new Elysia({ prefix: "/api" })
 
   // 🔥 MIDDLEWARE: Cek Login Dulu
 // 🔥 MIDDLEWARE: Cek Login (Support Cookie & Header)
