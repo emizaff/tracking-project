@@ -1,19 +1,77 @@
 ---
+// Import global CSS agar Tailwind dan gaya dasar aktif
 import "../styles/global.css";
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+const description = "Pantau progress resolusi 12 project di tahun 2026 oleh Faiq. Tracking project";
+const siteUrl = "https://faiq-tracking-project.netlify.app"; 
+const ogImage = "/Logo8.png"; 
 ---
 
+<!doctype html>
 <html lang="id">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>Login - Focus 2026</title>
-  </head>
-  <body class="bg-slate-100 flex items-center justify-center min-h-screen">
-    <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-slate-200">
-      <div class="text-center mb-6">
-        <h1 class="text-2xl font-bold text-slate-800">🚀 Focus 2026</h1>
-        <p class="text-slate-500 text-sm">Masuk untuk memulai produktivitas</p>
-      </div>
-      <slot /> </div>
-  </body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		
+		<!-- SEO Dasar -->
+		<title>{title} | Tracking Project</title>
+		<meta name="description" content={description} />
+		<meta name="keywords" content="Tracking Project, Faiq, Productivity, 12 Projects Challenge, Bun, ElysiaJS, Astro" />
+		<meta name="author" content="Faiq" />
+
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={siteUrl} />
+		<meta property="og:title" content={`${title} | Tracking Project`} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={ogImage} />
+
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content={siteUrl} />
+		<meta property="twitter:title" content={`${title} | Tracking Project`} />
+		<meta property="twitter:description" content={description} />
+		<meta property="twitter:image" content={ogImage} />
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+	</head>
+	<body class="bg-[#090909] text-white font-['Plus_Jakarta_Sans'] selection:bg-[#f01036]/30 overflow-x-hidden">
+		<slot />
+	</body>
 </html>
+
+<style is:global>
+	:root {
+		--accent: #f01036;
+		--bg-dark: #090909;
+		--card-dark: #1A1A1A;
+	}
+	
+	html {
+		scroll-behavior: smooth;
+	}
+
+	/* Custom Scrollbar */
+	::-webkit-scrollbar {
+		width: 6px;
+	}
+	::-webkit-scrollbar-track {
+		background: #090909;
+	}
+	::-webkit-scrollbar-thumb {
+		background: #333;
+		border-radius: 10px;
+	}
+	::-webkit-scrollbar-thumb:hover {
+		background: #f01036;
+	}
+</style>

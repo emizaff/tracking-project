@@ -1,6 +1,5 @@
 // client/src/lib/api.ts
-const API_URL = "http://localhost:3000";
-
+const API_URL = import.meta.env.PUBLIC_API_URL || "http://localhost:3000";
 export const api = {
   async post(endpoint: string, body: any) {
     try {

@@ -1,0 +1,16 @@
+[build]
+  # Gunakan bun untuk build
+  command = "bun run build"
+  # Folder output Astro default
+  publish = "dist" 
+  base = "web-public"
+
+[dev]
+  command = "bun run dev"
+
+# Opsional: Jika nanti pakai React Router (SPA), perlu ini.
+# Jika murni Astro (MPA), ini tidak wajib tapi aman dipasang.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

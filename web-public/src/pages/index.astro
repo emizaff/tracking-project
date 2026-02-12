@@ -1,99 +1,115 @@
 ---
-// src/pages/index.astro
-import "../styles/global.css";
+import AuthLayout from '../layouts/AuthLayout.astro';
 
-// Import Komponen React yang baru kita buat
+// Import Komponen React
 import PublicProjectList from '../components/PublicProjectList';
 import PublicGoalList from '../components/PublicGoalList';
 import PublicIdeaForm from '../components/PublicIdeaForm';
+
+// Pindahkan logika Date ke sini untuk menghindari error TS di template
+const currentYear = new Date().getFullYear();
 ---
 
-<html lang="id" class="scroll-smooth">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>My Journey 🚀 | Focus Tracker Public</title>
-    
-    <style>
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-    </style>
-</head>
-<body class="bg-[#0f172a] text-slate-300 font-sans antialiased selection:bg-indigo-500 selection:text-white">
+<AuthLayout title="Mewujudkan Mimpi | Public Roadmap">
+    <main class="min-h-screen selection:bg-[#f01036]/30 selection:text-white">
+        
+        <!-- HERO SECTION -->
+        <section class="relative pt-24 pb-32 overflow-hidden border-b border-[#1A1A1A]">
+            <!-- Red Glow Background Decor -->
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-96 bg-[#f01036]/10 blur-[120px] rounded-full -z-10"></div>
 
-    {/* HERO SECTION */}
-    <section class="relative pt-24 pb-20 overflow-hidden">
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+            <div class="max-w-4xl mx-auto px-6 relative z-10 text-center">
+                <!-- Badge 12 Project Challenge -->
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1A1A1A] border border-[#333] backdrop-blur-md text-[#f01036] text-[10px] font-black uppercase tracking-widest mb-8 animate-pulse">
+                    <span class="w-2 h-2 rounded-full bg-[#f01036]"></span>
+                    12 Projects Challenge: 1 of 12
+                </div>
+                
+                <h1 class="text-5xl md:text-7xl font-black text-white mb-6 leading-tight tracking-tight">
+                    Mewujudkan <span class="text-[#f01036] drop-shadow-[0_0_15px_rgba(240,16,54,0.4)]">Mimpi</span> <br class="hidden md:block" />
+                    Menjadi Nyata.
+                </h1>
+                
+                <p class="text-lg md:text-xl text-[#888] max-w-2xl mx-auto leading-relaxed mb-10 font-medium">
+                    Selamat datang di dashboard publik saya. Di sini kalian bisa memantau perkembangan project yang sedang saya kerjakan secara real-time.
+                </p>
 
-        <div class="max-w-4xl mx-auto px-6 relative z-10 text-center">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700/50 backdrop-blur-md text-indigo-400 text-xs font-bold uppercase tracking-wider mb-8 animate-float">
-                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                Building In Public
-            </div>
-            
-            <h1 class="text-5xl md:text-7xl font-black text-white mb-6 leading-tight tracking-tight">
-                Mewujudkan <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-500">Mimpi</span> <br class="hidden md:block" />
-                Menjadi Nyata.
-            </h1>
-            
-            <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10">
-                Selamat datang di dashboard publik saya. Di sini kalian bisa memantau project yang sedang saya kerjakan secara real-time.
-            </p>
-
-            <div class="flex flex-wrap justify-center gap-4">
-                <a href="#projects" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold transition shadow-lg shadow-indigo-500/25">
-                    Lihat Project 🚀
-                </a>
-                <a href="#ideas" class="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 rounded-xl font-bold transition">
-                    Kirim Ide 💡
-                </a>
-            </div>
-        </div>
-    </section>
-
-    {/* SECTION 1: PROJECT AKTIF (UTAMA) */}
-    <section id="projects" class="py-20 bg-slate-900/30 border-t border-slate-800/50">
-        <div class="max-w-6xl mx-auto px-6">
-            <div class="flex items-center gap-4 mb-12">
-                <div class="h-10 w-1 bg-indigo-500 rounded-full"></div>
-                <div>
-                    <h2 class="text-3xl font-bold text-white">Active Projects</h2>
-                    <p class="text-slate-400 text-sm">Apa yang sedang saya kerjakan saat ini.</p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="#projects" class="px-10 py-4 bg-[#f01036] hover:bg-[#d00e2e] text-white rounded-2xl font-bold transition-all shadow-[0_0_20px_rgba(240,16,54,0.3)] hover:scale-105 active:scale-95">
+                        Lihat Project 🚀
+                    </a>
+                    <a href="#ideas" class="px-10 py-4 bg-[#1A1A1A] hover:bg-[#222] text-[#ccc] border border-[#333] rounded-2xl font-bold transition-all">
+                        Kirim Ide 💡
+                    </a>
                 </div>
             </div>
-            
-            {/* Load Component React dengan client:load agar data diambil di browser */}
-            <PublicProjectList client:load />
-        </div>
-    </section>
+        </section>
 
-    {/* SECTION 2: GOALS / WISHLIST (SEKUNDER) */}
-    <section id="goals" class="py-20">
-        <div class="max-w-6xl mx-auto px-6">
-            <div class="flex items-center gap-4 mb-12">
-                <div class="h-10 w-1 bg-amber-500 rounded-full"></div>
-                <div>
-                    <h2 class="text-3xl font-bold text-white">Goals & Rewards</h2>
-                    <p class="text-slate-400 text-sm">Target pribadi dan reward pencapaian.</p>
+        <div class="max-w-6xl mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-3 gap-16">
+            
+            <!-- SECTION 1: PROJECT AKTIF (KIRI/UTAMA) -->
+            <section id="projects" class="lg:col-span-2 space-y-10">
+                <div class="flex flex-col gap-2 mb-10">
+                    <h2 class="text-3xl font-black text-white flex items-center gap-3">
+                        <span class="w-8 h-1 bg-[#f01036] rounded-full"></span> Active Projects
+                    </h2>
+                    <p class="text-[#666] font-medium">Inisiatif yang sedang dikembangkan saat ini.</p>
+                </div>
+                
+                <PublicProjectList client:load />
+            </section>
+
+            <!-- SIDEBAR: GOALS & IDEA FORM (KANAN) -->
+            <aside class="space-y-20">
+                
+                <!-- SECTION 2: GOALS / WISHLIST -->
+                <section id="goals">
+                    <div class="flex flex-col gap-2 mb-8">
+                        <h2 class="text-xl font-black text-white flex items-center gap-3">
+                            <span class="text-[#f01036]">#</span> Goals & Rewards
+                        </h2>
+                        <p class="text-xs text-[#666] font-medium">Target pribadi dan reward pencapaian.</p>
+                    </div>
+
+                    <div class="bg-[#1A1A1A]/50 p-6 rounded-3xl border border-[#333]">
+                        <PublicGoalList client:visible />
+                    </div>
+                </section>
+
+                <!-- SECTION 3: IDEA FORM -->
+                <section id="ideas" class="pt-10 border-t border-[#1A1A1A]">
+                    <div class="flex flex-col gap-2 mb-6">
+                        <h2 class="text-xl font-black text-white flex items-center gap-3">
+                            <span class="text-[#f01036]">#</span> Feed the Engine
+                        </h2>
+                        <p class="text-xs text-[#666] font-medium">Punya saran fitur atau ide gila?</p>
+                    </div>
+
+                    <div class="bg-[#1A1A1A] p-6 rounded-3xl border border-[#333] shadow-xl">
+                        <PublicIdeaForm client:visible />
+                    </div>
+                </section>
+
+            </aside>
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="py-16 border-t border-[#1A1A1A] text-center bg-[#050505]">
+            <div class="flex flex-col items-center gap-6">
+                <img src="/Logo8.png" alt="Logo" class="w-10 h-10 grayscale opacity-20" />
+                <div class="space-y-2">
+                    <p class="text-[#444] text-[10px] font-black uppercase tracking-[0.4em]">
+                        Built with <span class="text-[#f01036]">Astro</span> & <span class="text-[#ccc]">Elysia</span>
+                    </p>
+                    <p class="text-[#333] text-[9px] font-bold">
+                        &copy; {currentYear} Focus Tracker &bull; Project 01
+                    </p>
+                </div>
+                <div class="flex gap-6">
+                    <a href="/login" class="text-[#444] hover:text-[#f01036] transition-colors text-xs font-bold uppercase tracking-widest">Admin Login</a>
                 </div>
             </div>
+        </footer>
 
-            <PublicGoalList client:visible />
-        </div>
-    </section>
-
-    {/* SECTION 3: IDEA FORM */}
-    <section id="ideas" class="py-24 relative border-t border-slate-800/50 bg-slate-900/20">
-        <div class="max-w-2xl mx-auto px-6">
-            <PublicIdeaForm client:visible />
-        </div>
-    </section>
-
-    <footer class="py-10 text-center border-t border-slate-800 text-slate-600 text-sm bg-[#0f172a]">
-        <p>Built with <span class="text-indigo-500 font-bold">Astro</span> & <span class="text-pink-500 font-bold">Elysia</span>.</p>
-        <p class="mt-2">&copy; {new Date().getFullYear()} Focus Tracker.</p>
-    </footer>
-
-</body>
-</html>
+    </main>
+</AuthLayout>
