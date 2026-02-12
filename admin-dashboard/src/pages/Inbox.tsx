@@ -24,7 +24,8 @@ interface Idea {
 
 export default function Inbox() {
   const navigate = useNavigate();
-  const [ideas, setIdeas] = useState<Idea[]>([]);
+  // 🔥 Default state array kosong biar aman
+  const [ideas, setIdeas] = useState<Idea[]>([]); 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => { loadIdeas(); }, []);
@@ -32,8 +33,21 @@ export default function Inbox() {
   const loadIdeas = async () => {
     try {
       const data = await TrackingService.getPublicIdeas();
-      setIdeas(data);
-    } catch (e) { console.error(e); } finally { setLoading(false); }
+      
+      // 🔥 SAFETY CHECK: Pastikan data itu Array sebelum di-set!
+      // Kalau fetch gagal/return null, kita paksa jadi [] biar gak crash
+      if (Array.isArray(data)) {
+          setIdeas(data);
+      } else {
+          console.warn("Data inbox bukan array:", data);
+          setIdeas([]); 
+      }
+    } catch (e) { 
+        console.error("Gagal load ideas:", e); 
+        setIdeas([]); // Fallback ke array kosong
+    } finally { 
+        setLoading(false); 
+    }
   };
 
   const handleApprove = async (id: number) => {
@@ -53,7 +67,6 @@ export default function Inbox() {
   };
 
   if (loading) return (
-    // 🔥 UBAH: Background Dark #090909
     <div className="min-h-screen bg-[#090909] flex items-center justify-center text-[#666] font-sans">
         <div className="flex flex-col items-center gap-3">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f01036]"></div>
@@ -63,7 +76,6 @@ export default function Inbox() {
   );
 
   return (
-    // 🔥 UBAH: Background Dark #090909
     <div className="min-h-screen bg-[#090909] text-white p-4 md:p-8 font-sans pb-32">
       <div className="max-w-4xl mx-auto">
         
@@ -77,7 +89,11 @@ export default function Inbox() {
             </button>
             <div>
                 <h1 className="text-3xl font-extrabold text-white flex items-center gap-2">
-                    Kotak Masuk <span className="bg-[#f01036] text-white text-xs px-2 py-1 rounded-full shadow-[0_0_10px_rgba(240,16,54,0.4)]">{ideas.length}</span>
+                    Kotak Masuk 
+                    {/* 🔥 SAFETY CHECK: Pakai '?.' dan '|| 0' biar gak crash kalau ideas null */}
+                    <span className="bg-[#f01036] text-white text-xs px-2 py-1 rounded-full shadow-[0_0_10px_rgba(240,16,54,0.4)]">
+                        {ideas?.length || 0}
+                    </span>
                 </h1>
                 <p className="text-[#666] text-sm">Moderasi ide dan saran dari Web Public.</p>
             </div>
@@ -85,7 +101,8 @@ export default function Inbox() {
 
         {/* LIST IDEAS */}
         <div className="space-y-4">
-          {ideas.length === 0 ? (
+          {/* 🔥 SAFETY CHECK: Pastikan ideas ada isinya */}
+          {!ideas || ideas.length === 0 ? (
             <div className="text-center py-20 bg-[#1A1A1A] rounded-3xl border border-dashed border-[#333] text-[#666]">
               <div className="w-16 h-16 bg-[#222] rounded-full flex items-center justify-center mx-auto mb-4 border border-[#333]">
                 <InboxIcon size={32} className="opacity-50 text-[#888]" />
@@ -95,19 +112,23 @@ export default function Inbox() {
             </div>
           ) : (
             ideas.map((item) => (
-              // 🔥 UBAH: Card Background #1A1A1A
               <div key={item.id} className={`p-6 rounded-2xl border transition-all hover:shadow-lg ${item.isApproved ? 'bg-green-900/10 border-green-900/30' : 'bg-[#1A1A1A] border-[#333] hover:border-[#f01036]/30'}`}>
                 
                 {/* HEADER CARD */}
                 <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-[#222] flex items-center justify-center text-[#f01036] font-bold shadow-inner border border-[#333]">
+                            {/* 🔥 SAFETY CHECK: Handle kalau senderName null */}
                             {item.senderName ? item.senderName.charAt(0).toUpperCase() : <User size={18} />}
                         </div>
                         <div>
-                            <span className="font-bold text-white block leading-tight text-lg">{item.senderName}</span>
+                            <span className="font-bold text-white block leading-tight text-lg">
+                                {item.senderName || "Anonim"}
+                            </span>
                             <span className="text-xs text-[#666] flex items-center gap-1 mt-0.5">
-                                <Clock size={10} /> {new Date(item.createdAt).toLocaleDateString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
+                                <Clock size={10} /> 
+                                {/* 🔥 SAFETY CHECK: Invalid Date Handling */}
+                                {item.createdAt ? new Date(item.createdAt).toLocaleDateString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : "-"}
                             </span>
                         </div>
                     </div>
