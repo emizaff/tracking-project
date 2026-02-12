@@ -4,16 +4,17 @@ import PublicProjectList from '../components/PublicProjectList';
 import PublicIdeaForm from '../components/PublicIdeaForm';
 import { Toaster } from 'sonner';
 import '../styles/global.css';
+import TryItYourself from '../components/TryItYourself';
 ---
 
 <html lang="id" class="scroll-smooth">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/Logo8.png" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <title>Tracking Project - Showcase & Ideas</title>
-    <meta name="description" content="Platform monitoring proyek transparan dan pengumpulan ide publik." />
+    <title>Tracking Project - 2026 Resolution</title>
+    <meta name="description" content="12 Project dalam 12 Bulan. Tantangan coding personal." />
   </head>
   <body class="bg-slate-950 text-slate-200 antialiased selection:bg-purple-500/30">
     <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950 -z-10"></div>
@@ -27,7 +28,7 @@ import '../styles/global.css';
             <a href="/" class="group relative">
                <div class="absolute -inset-2 bg-purple-500/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                <img 
-                src="/favicon.svg" 
+                src="/Logo8.png" 
                 alt="Logo" 
                 class="h-8 w-8 relative z-10 transition-all duration-300 group-hover:drop-shadow-[0_0_15px_rgba(168,85,247,0.8)] group-hover:scale-110"
               />
@@ -37,57 +38,58 @@ import '../styles/global.css';
             </span>
           </div>
           <div class="flex items-center gap-6">
-            <a href="/about" class="text-sm font-medium text-slate-400 hover:text-purple-400 transition-colors">About</a>
+            <a href="/about" class="text-sm font-medium text-slate-400 hover:text-purple-400 transition-colors">About Me</a>
             <a href="#projects" class="text-sm font-medium text-slate-400 hover:text-purple-400 transition-colors">Projects</a>
-            <a href="#ideas" class="text-sm font-medium text-slate-400 hover:text-purple-400 transition-colors">Submit Idea</a>
+            <a href="#ideas" class="text-sm font-medium text-slate-400 hover:text-purple-400 transition-colors">Drop Idea</a>
           </div>
         </div>
       </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-20">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-24">
       
       <section class="text-center space-y-6 py-10 relative">
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-purple-600/20 blur-[100px] -z-10 rounded-full pointer-events-none"></div>
         
         <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6">
-          Build in <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Public</span>.
+          12 Bulan. <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">12 Project.</span>
         </h1>
         <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
-          Lihat perkembangan proyek terbaru secara transparan dan berkontribusi dengan ide-ide kreatif Anda.
+          Tahun ini gue menantang diri sendiri buat ship 1 produk setiap bulan. Pantau progressnya di sini, no bullshit.
         </p>
       </section>
 
       <section id="projects" class="scroll-mt-24">
         <div class="flex items-center justify-between mb-10">
           <div>
-            <h2 class="text-3xl font-bold text-white mb-2">Active Projects</h2>
-            <p class="text-slate-400">Memantau progress pengembangan secara realtime.</p>
+            <h2 class="text-3xl font-bold text-white mb-2">Build Log</h2>
+            <p class="text-slate-400">Apa yang lagi gue masak sekarang.</p>
           </div>
         </div>
-        
         <PublicProjectList client:visible />
       </section>
 
       <section id="ideas" class="scroll-mt-24 max-w-2xl mx-auto">
         <div class="text-center mb-10">
-          <h2 class="text-3xl font-bold text-white mb-3">Punya Ide Menarik?</h2>
-          <p class="text-slate-400">Kirimkan saran fitur atau ide proyek baru. Kami mendengarkan.</p>
+          <h2 class="text-3xl font-bold text-white mb-3">Kasih Gue Ide</h2>
+          <p class="text-slate-400">Buntu nih. Kalau lu punya ide liar, lempar aja ke sini. Kalau menarik, gue bikinin.</p>
         </div>
-        
         <div class="bg-slate-900/50 border border-white/5 rounded-2xl p-6 md:p-8 backdrop-blur-sm shadow-2xl">
           <PublicIdeaForm client:visible />
         </div>
       </section>
 
+      <section class="scroll-mt-24">
+        <TryItYourself client:visible />
+      </section>
     </main>
 
     <footer class="border-t border-white/5 bg-slate-950 py-12 mt-12">
       <div class="max-w-7xl mx-auto px-4 text-center">
         <p class="text-slate-500 text-sm">
-          &copy; {new Date().getFullYear()} Tracking Project. Built with Astro & React.
+          &copy; {new Date().getFullYear()} Tracking Project. Dibuat sambil ngopi.
         </p>
-        </div>
+      </div>
     </footer>
   </body>
 </html>

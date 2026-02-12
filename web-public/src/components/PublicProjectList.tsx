@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../lib/api';
+import { Briefcase, CheckCircle2, Clock, Loader2, AlertTriangle } from 'lucide-react';
 
-// Definisikan tipe data agar coding lebih enak
+// Interface untuk TypeScript agar lebih aman
 interface Task {
   id: number;
   isCompleted: boolean;
@@ -10,88 +11,119 @@ interface Task {
 interface Project {
   id: number;
   title: string;
-  tasks: Task[];
+  description?: string;
+  priority?: string;
+  startDate?: string;
+  tasks?: Task[];
 }
 
 export default function PublicProjectList() {
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [loading, setLoading] = useState(true);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        // Panggil endpoint /public/projects yang baru dibuat di backend
-        api.getPublic('/public/projects')
-            .then(res => {
-                // Backend mereturn { success: true, data: [...] }
-                // Jadi kita ambil res.data
-                if (res?.data && Array.isArray(res.data)) {
-                    setProjects(res.data);
-                } else {
-                    console.warn("Format data project salah atau kosong", res);
-                    setProjects([]);
-                }
-            })
-            .catch(e => console.error(e))
-            .finally(() => setLoading(false));
-    }, []);
+  useEffect(() => {
+    // Panggil endpoint /public/projects
+    api.getPublic('/public/projects')
+      .then((res: any) => {
+        // console.log("DEBUG RESPONSE:", res); // Uncomment untuk debug
 
-    if (loading) return (
-        <div className="flex items-center justify-center p-8 space-x-2 text-purple-400 animate-pulse">
-            <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
-            <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-100"></div>
-            <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-200"></div>
-            <span className="font-mono text-sm ml-2">Menghubungkan ke satelit...</span>
-        </div>
-    );
+        // 🔥 FIX LOGIC DATA PARSING DISINI:
+        // Cek apakah response langsung berupa Array (seperti di server index.ts yang kita buat)
+        if (Array.isArray(res)) {
+           setProjects(res);
+        } 
+        // Cek jika response dibungkus object { data: [...] } (format standar API)
+        else if (res && res.data && Array.isArray(res.data)) {
+           setProjects(res.data);
+        } 
+        // Jika format tidak dikenali
+        else {
+           console.error("Format data tidak sesuai ekspektasi:", res);
+           setProjects([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Gagal mengambil data project:", err);
+        setProjects([]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-    if (projects.length === 0) {
+  const getProgress = (tasks: Task[] | undefined) => {
+    if (!tasks || tasks.length === 0) return 0;
+    const completed = tasks.filter(t => t.isCompleted).length;
+    return Math.round((completed / tasks.length) * 100);
+  };
+
+  if (loading) return (
+    <div className="py-20 flex justify-center text-purple-500">
+        <Loader2 className="animate-spin w-10 h-10" />
+    </div>
+  );
+  
+  if (projects.length === 0) return (
+    <div className="py-10 text-center border border-dashed border-slate-700 rounded-xl bg-slate-900/50">
+        <p className="text-slate-400">Belum ada proyek yang dipublikasikan.</p>
+    </div>
+  );
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {projects.map(project => {
+        const percent = getProgress(project.tasks);
+        const isDone = percent === 100 && (project.tasks?.length || 0) > 0;
+
         return (
-            <div className="text-center p-8 border border-dashed border-white/10 rounded-3xl bg-white/5">
-                <p className="text-slate-400">Belum ada proyek yang dipublikasikan.</p>
+          <div key={project.id} className="bg-slate-900/80 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 hover:border-purple-500/50 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all group relative overflow-hidden">
+            
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                {/* Priority Badge */}
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${
+                    project.priority === 'HIGH' ? 'text-red-400 bg-red-900/20 border-red-900/50' : 
+                    project.priority === 'LOW' ? 'text-blue-400 bg-blue-900/20 border-blue-900/50' :
+                    'text-yellow-400 bg-yellow-900/20 border-yellow-900/50'
+                }`}>
+                  {project.priority || "NORMAL"}
+                </span>
+                
+                <h3 className="text-xl font-bold text-white mt-2 group-hover:text-purple-300 transition-colors">
+                  {project.title}
+                </h3>
+              </div>
+              
+              {/* Percentage */}
+              <div className="text-right">
+                <span className={`text-2xl font-black ${isDone ? 'text-green-400' : 'text-white'}`}>{percent}%</span>
+              </div>
             </div>
+
+            <p className="text-slate-400 text-sm mb-6 line-clamp-2 h-10">
+              {project.description || "Project ini sedang dikerjakan."}
+            </p>
+
+            {/* Progress Bar */}
+            <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden mb-4">
+              <div 
+                className={`h-full transition-all duration-1000 ${isDone ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'bg-purple-600 shadow-[0_0_10px_rgba(168,85,247,0.5)]'}`} 
+                style={{ width: `${percent}%` }}
+              ></div>
+            </div>
+
+            {/* Footer Info */}
+            <div className="flex justify-between items-center text-xs text-slate-500 border-t border-slate-700/50 pt-3">
+              <div className="flex items-center gap-1.5">
+                <Clock size={12} />
+                <span>{project.startDate ? new Date(project.startDate).toLocaleDateString('id-ID') : 'On Going'}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 size={12} className={isDone ? "text-green-500" : ""} />
+                <span>{(project.tasks || []).filter((t:any) => t.isCompleted).length} / {project.tasks?.length || 0} Task</span>
+              </div>
+            </div>
+          </div>
         );
-    }
-
-    return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {projects.map((p) => {
-                const total = p.tasks?.length || 0;
-                const done = p.tasks?.filter((t) => t.isCompleted).length || 0;
-                const percent = total > 0 ? Math.round((done / total) * 100) : 0;
-                const isFinished = percent === 100;
-
-                return (
-                    <div key={p.id} className="group relative bg-[#0a0a0a] p-6 rounded-3xl border border-white/5 hover:border-purple-500/40 transition-all duration-300 hover:shadow-[0_0_20px_rgba(168,85,247,0.1)]">
-                        
-                        <div className="flex justify-between items-start mb-6">
-                            <h3 className="font-bold text-lg text-slate-200 group-hover:text-purple-400 transition-colors duration-300">
-                                {p.title}
-                            </h3>
-                            <span className={`text-[10px] font-black px-2 py-1 rounded-full border ${
-                                isFinished 
-                                ? 'text-green-400 bg-green-400/10 border-green-400/20' 
-                                : 'text-purple-400 bg-purple-400/10 border-purple-400/20'
-                            }`}>
-                                {percent}%
-                            </span>
-                        </div>
-                        
-                        <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mb-5">
-                            <div 
-                                className={`h-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(168,85,247,0.5)] ${isFinished ? 'bg-green-500' : 'bg-purple-600'}`} 
-                                style={{ width: `${percent}%` }}
-                            ></div>
-                        </div>
-
-                        <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                            <div className="flex items-center gap-2">
-                                <span className={`w-1.5 h-1.5 rounded-full ${isFinished ? 'bg-green-500 animate-pulse' : 'bg-purple-500 animate-pulse'}`}></span>
-                                <span>{isFinished ? 'Selesai' : 'Sedang Dikerjakan'}</span>
-                            </div>
-                            <span>{done} / {total} Tasks</span>
-                        </div>
-                    </div>
-                );
-            })}
-        </div>
-    );
+      })}
+    </div>
+  );
 }
